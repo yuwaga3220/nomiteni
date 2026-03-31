@@ -38,6 +38,10 @@ body {
   background: #1f4ea3;
   color: #fff;
   border-bottom: 1px solid #12336f;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
 }
 
 .appHeader h1 {
@@ -45,6 +49,54 @@ body {
   font-size: 24px;
   font-weight: 700;
   color: #fff;
+}
+
+.headerActions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.headerActions span {
+  line-height: 1;
+}
+
+.topCreateTournament {
+  display: flex;
+  justify-content: center;
+}
+
+.bigCreateTournamentButton {
+  min-width: 320px;
+  padding: 18px 24px;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.loginGrid {
+  align-items: start;
+}
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modalCard {
+  width: min(520px, 100%);
+  background: #fff;
+  border-radius: 10px;
+  border: 1px solid #dce1ea;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .grid2 {

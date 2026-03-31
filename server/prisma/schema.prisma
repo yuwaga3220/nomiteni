@@ -33,6 +33,7 @@ enum MatchStatus {
 model User {
   id             Int      @id @default(autoincrement())
   email          String   @unique
+  password       String
   name           String?
   partyJoin      Boolean  @default(false)
   note           String?
@@ -46,6 +47,10 @@ model User {
 model Tournament {
   id               Int              @id @default(autoincrement())
   name             String
+  adminPasscode    String           @unique
+  eventDate        String?
+  timeSlot         String?
+  courtCount       Int              @default(2)
   status           TournamentStatus @default(DRAFT)
   observerPasscode String?
   entryPasscode    String?

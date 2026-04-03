@@ -4,7 +4,7 @@
 
 ## 技術構成
 
-- 言語: TypeScript
+- 言語: TypeScript + JavaScript
 - フロントエンド: React + Vite
 - バックエンド: Node.js + Express + Socket.IO
 - DB: Prisma + SQLite

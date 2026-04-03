@@ -4,8 +4,9 @@
 
 ## 技術構成
 
-- フロントエンド: React + TypeScript + Vite
-- バックエンド: Express + TypeScript + Socket.IO
+- 言語: TypeScript
+- フロントエンド: React + Vite
+- バックエンド: Node.js + Express + Socket.IO
 - DB: Prisma + SQLite
 
 ## 実装済み機能

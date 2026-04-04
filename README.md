@@ -18,6 +18,15 @@
 | `server/` | 旧 NestJS バックエンド（参照用。通常の起動では使いません） |
 | ルート `package.json` | `npm run dev` は `client` のみ起動 |
 
+## 起動・ビルド
+
+```bash
+npm install --prefix client
+cd client && npx prisma migrate deploy
+npm run dev --prefix client
+```
+
+ブラウザは **http://127.0.0.1:3000**（`0.0.0.0` は開けません）。`Nomiteni ready` がターミナルに出ているか確認してください。ポート競合時は古い `node` を止めるか `PORT=3001` を設定。
 
 ## 背景・課題
 - テニスサークルでの大会運営を任される中、エントリー・当日の参加登録・試合状況の把握など、紙やホワイトボードなどを使用し、デジタル化が進んでいない。

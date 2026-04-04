@@ -1,4 +1,9 @@
-import type { Tournament } from "../../types";
+/**
+ * ログインカードセクション
+ */
+"use client";
+
+import type { Tournament } from "@/types";
 
 type LoginCardsProps = {
   tournamentPasscode: string;

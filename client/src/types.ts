@@ -1,3 +1,6 @@
+/**
+ * 型定義
+ */
 export type Role = "PARTICIPANT" | "ADMIN" | "OBSERVER";
 
 export type User = {

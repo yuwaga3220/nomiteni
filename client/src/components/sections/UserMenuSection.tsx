@@ -1,4 +1,10 @@
-import type { Me, TournamentBrief } from "../../types";
+/**
+ * ユーザーメニューセクション
+ */
+
+"use client";
+
+import type { Me, TournamentBrief } from "@/types";
 
 // ユーザーメニューセクションのプロパティ
 type UserMenuProps = {

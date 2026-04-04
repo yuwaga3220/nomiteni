@@ -1,4 +1,10 @@
-import type { CheckinState, PublicState, Tournament, User } from "../../types";
+/**
+ * 管理者メニューセクション
+ */
+
+"use client";
+
+import type { CheckinState, PublicState, Tournament, User } from "@/types";
 
 type AdminManagementProps = {
   active: Tournament | null | undefined;

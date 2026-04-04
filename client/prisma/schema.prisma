@@ -1,0 +1,86 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+enum UserRole {
+  PARTICIPANT
+  ADMIN
+  OBSERVER
+}
+
+enum TournamentStatus {
+  DRAFT
+  RUNNING
+  FINISHED
+}
+
+enum MatchStatus {
+  PENDING
+  ASSIGNED
+  IN_PROGRESS
+  COMPLETED
+}
+
+model User {
+  id             Int      @id @default(autoincrement())
+  email          String   @unique
+  password       String
+  name           String?
+  partyJoin      Boolean  @default(false)
+  note           String?
+  role           UserRole @default(PARTICIPANT)
+  checkedIn      Boolean  @default(false)
+  canPlayToday   Boolean?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Tournament {
+  id               Int              @id @default(autoincrement())
+  name             String
+  adminPasscode    String           @unique
+  eventDate        String?
+  timeSlot         String?
+  courtCount       Int              @default(2)
+  status           TournamentStatus @default(DRAFT)
+  observerPasscode String?
+  entryPasscode    String?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  matches          Match[]
+}
+
+model Match {
+  id            Int         @id @default(autoincrement())
+  tournamentId  Int
+  round         Int
+  position      Int
+  player1Id     Int?
+  player2Id     Int?
+  winnerId      Int?
+  status        MatchStatus @default(PENDING)
+  courtNumber   Int?
+  nextMatchId   Int?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  tournament Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  nextMatch  Match?     @relation("MatchNext", fields: [nextMatchId], references: [id], onDelete: SetNull)
+  feeders    Match[]    @relation("MatchNext")
+
+  @@unique([tournamentId, round, position])
+}
+
+model AppSetting {
+  key   String @id
+  value String
+}

@@ -1,4 +1,10 @@
-import type { AuthMode } from "../../types";
+/**
+ * ヘッダー認証ボタンセクション
+ */
+
+"use client";
+
+import type { AuthMode } from "@/types";
 
 type HeaderAuthButtonsProps = {
   setAuthMode: (mode: AuthMode) => void;

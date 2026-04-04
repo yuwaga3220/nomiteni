@@ -1,3 +1,7 @@
+/**
+ * アプリケーションセクション
+ */
+
 export { AuthModal, HeaderAuthButtons } from "./sections/HeaderAuth";
 export { LoginCardsSection } from "./sections/LoginCardsSection";
 export { UserMenuSection } from "./sections/UserMenuSection";

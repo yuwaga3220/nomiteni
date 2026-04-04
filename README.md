@@ -1,14 +1,45 @@
-# Nomiteni
+# Nomiteni（テニサー向け大会運営アプリ）
 
-テニスのシングルス大会を運営するための Web アプリです。
+テニスサークルの大会運営を自動化するWebアプリケーションです。
 
 ## 技術構成
 
-- フロントエンド: React + TypeScript + Vite
-- バックエンド: Express + TypeScript + Socket.IO
-- DB: Prisma + SQLite
+- 言語: TypeScript
+- アプリ: Next.js（App Router）＋カスタム Node サーバー（`server.ts`）で **HTTP・API・Socket.IO を同一ポート**で提供
+- API: `src/app/api/**/route.ts`（Route Handlers）
+- リアルタイム: Socket.IO（`socket.io` / `socket.io-client`）
+- DB: Prisma / SQLite（`better-sqlite3` アダプタ、`client/prisma`）
 
-## 実装済み機能
+## ディレクトリ構成（概要）
+
+| パス | 内容 |
+|------|------|
+| `client/` | Next.js アプリ本体。`server.ts` が起動エントリ、`src/app/api` が REST API、`prisma/` にスキーマ・マイグレーション |
+| `server/` | 旧 NestJS バックエンド（参照用。通常の起動では使いません） |
+| ルート `package.json` | `npm run dev` は `client` のみ起動 |
+
+
+## 背景・課題
+- テニスサークルでの大会運営を任される中、エントリー・当日の参加登録・試合状況の把握など、紙やホワイトボードなどを使用し、デジタル化が進んでいない。
+- 大会現場に行かないと試合状況・結果が分からない。
+
+## メイン機能
+- 大会の開催・エントリー募集
+- トーナメント自動作成
+- 当日の参加登録
+- 試合状況のリアルタイム表示（観戦）
+- 結果の集計・出力
+  
+## 結果と今後の展望
+
+## 技術的課題と解決策
+
+## 工夫・こだわり
+テニスサークルの大会や宴会への参加率を上げるためのポイント機能などのエンタメ性も高い機能も搭載すること。
+テニスサークル自体の盛り上げに貢献できるアプリを目指している。
+
+
+## 実装済み機能メモ
 
 - 大会エントリー（メールアドレスでログイン、名前・飲み会参加有無・備考入力）
 - 管理者ログイン（パスコード方式）
@@ -17,32 +48,3 @@
 - 試合運営（コート数設定、試合カードのコート割り当て、開始、結果登録）
 - 勝者自動反映と次試合カードの自動生成
 - 参加者向けリアルタイム状況表示（進行中試合、トーナメント表）
-
-## 起動方法
-
-1. 依存関係をインストール
-
-```bash
-npm run setup
-```
-
-1. DB マイグレーション（初回）
-
-```bash
-npm run prisma:migrate --prefix server
-```
-
-1. 開発サーバー起動
-
-```bash
-npm run dev
-```
-
-- フロント: `http://localhost:5173`
-- API: `http://localhost:4000`
-
-## 管理者ログイン
-
-- バックエンド環境変数 `server/.env` の `ADMIN_PASSCODE` を使用
-- 初期値: `admin123`
-

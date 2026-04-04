@@ -1,4 +1,10 @@
-import type { Match, PublicState } from "../../types";
+/**
+ * 管理者試合管理セクション
+ */
+
+"use client";
+
+import type { Match, PublicState } from "@/types";
 
 type AdminMatchesProps = {
   state: PublicState | null;

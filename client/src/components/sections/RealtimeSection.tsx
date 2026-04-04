@@ -1,4 +1,10 @@
-import type { Match, PublicState, Tournament } from "../../types";
+/**
+ * リアルタイム進行表示セクション
+ */
+
+"use client";
+
+import type { Match, PublicState, Tournament } from "@/types";
 
 type RealtimeProps = {
   active: Tournament | null | undefined;

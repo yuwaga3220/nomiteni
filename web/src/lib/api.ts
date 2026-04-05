@@ -87,7 +87,7 @@ async function readApiFailureMessage(res: Response): Promise<string> {
     /* ignore */
   }
 
-  return `APIがエラーを返しました（${res.status}）。client で npx prisma migrate deploy を実行し、DB が最新か確認してください。`;
+  return `APIがエラーを返しました（${res.status}）。web で npx prisma migrate deploy を実行し、DB が最新か確認してください。`;
 }
 
 export function getSocket(): Socket {
@@ -120,7 +120,7 @@ export async function api<T>(path: string, init?: RequestInit): Promise<T> {
   } catch {
     const hint = base === "" ? "（同一オリジン）" : `（${base}）`;
     throw new Error(
-      `API に接続できません${hint}。client で npm run dev を実行し、ターミナルにエラーが出ていないか確認してください。`,
+      `API に接続できません${hint}。web で npm run dev を実行し、ターミナルにエラーが出ていないか確認してください。`,
     );
   }
   if (!res.ok) {

@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "Tennis singles tournament management app",
   "scripts": {
-    "dev": "npm run dev --prefix client",
-    "build": "npm run build --prefix client",
-    "setup": "npm install --prefix client"
+    "dev": "npm run dev --prefix web",
+    "build": "npm run build --prefix web",
+    "setup": "npm install --prefix web"
   },
   "keywords": [],
   "author": "",

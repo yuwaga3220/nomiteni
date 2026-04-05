@@ -8,25 +8,26 @@
 - アプリ: Next.js（App Router）＋カスタム Node サーバー（`server.ts`）で **HTTP・API・Socket.IO を同一ポート**で提供
 - API: `src/app/api/**/route.ts`（Route Handlers）
 - リアルタイム: Socket.IO（`socket.io` / `socket.io-client`）
-- DB: Prisma / SQLite（`better-sqlite3` アダプタ、`client/prisma`）
+- DB: Prisma / SQLite（`better-sqlite3` アダプタ、`web/prisma`）
 
 ## ディレクトリ構成（概要）
 
 | パス | 内容 |
 |------|------|
-| `client/` | Next.js アプリ本体。`server.ts` が起動エントリ、`src/app/api` が REST API、`prisma/` にスキーマ・マイグレーション |
-| `server/` | 旧 NestJS バックエンド（参照用。通常の起動では使いません） |
-| ルート `package.json` | `npm run dev` は `client` のみ起動 |
+| `web/` | Next.js アプリ本体。`server.ts` が起動エントリ、`src/app/api` が REST API、`prisma/` にスキーマ・マイグレーション |
+| ルート `package.json` | `npm run dev` は `web` のみ起動 |
 
 ## 起動・ビルド
 
 ```bash
-npm install --prefix client
-cd client && npx prisma migrate deploy
-npm run dev --prefix client
+npm install --prefix web
+cd web && npx prisma migrate deploy
+npm run dev --prefix web
 ```
 
 ブラウザは **http://127.0.0.1:3000**（`0.0.0.0` は開けません）。`Nomiteni ready` がターミナルに出ているか確認してください。ポート競合時は古い `node` を止めるか `PORT=3001` を設定。
+
+作業フォルダは **`web/`** です（ルートから `npm run dev` でも同じく起動します）。移行の名残で空の `client/` が残る場合は、エディタと dev サーバーを止めてからフォルダごと削除してください。
 
 ## 背景・課題
 - テニスサークルでの大会運営を任される中、エントリー・当日の参加登録・試合状況の把握など、紙やホワイトボードなどを使用し、デジタル化が進んでいない。

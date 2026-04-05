@@ -1,3 +1,5 @@
+// web/src/app/api/admin/matches/[id]/result/route.ts
+// 試合結果を登録する
 import { MatchStatus } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { z } from "zod";

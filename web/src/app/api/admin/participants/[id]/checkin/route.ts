@@ -1,3 +1,5 @@
+// web/src/app/api/admin/participants/[id]/checkin/route.ts
+// 参加者をチェックインする
 import { UserRole } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { z } from "zod";
@@ -8,6 +10,7 @@ import { broadcastState } from "@/lib/tournament-service";
 type RouteContext = { params: Promise<{ id: string }> };
 
 export async function POST(req: Request, ctx: RouteContext) {
+  
   const scoped = await requireScopedAdminTournament();
   if ("error" in scoped) return scoped.error;
 

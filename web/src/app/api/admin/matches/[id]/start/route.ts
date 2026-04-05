@@ -1,3 +1,5 @@
+// web/src/app/api/admin/matches/[id]/start/route.ts
+// 試合を開始する
 import { MatchStatus } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { requireScopedAdminTournament } from "@/lib/admin-scope";

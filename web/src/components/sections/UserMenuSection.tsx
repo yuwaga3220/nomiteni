@@ -1,6 +1,5 @@
-/**
- * ユーザーメニューセクション
- */
+// web/src/components/sections/UserMenuSection.tsx
+// ユーザーメニューセクション
 
 "use client";
 
@@ -31,7 +30,7 @@ export function UserMenuSection(props: UserMenuProps) {
         ログイン中: {props.me.name} ({props.me.email})
       </p>
 
-      {props.me.role === "PARTICIPANT" && (
+      {props.me.role === "PARTICIPANT" && ( // 参加者の場合
         <div className="subgrid">
           <h3>大会エントリー</h3>
           {props.entryTournament ? (

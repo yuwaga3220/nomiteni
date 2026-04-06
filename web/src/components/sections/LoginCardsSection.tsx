@@ -1,10 +1,11 @@
-/**
- * ログインカードセクション
- */
+// web/src/components/sections/LoginCardsSection.tsx
+// ログインカードセクション
+// home-page.tsxから呼び出される
 "use client";
 
 import type { Tournament } from "@/types";
 
+// ログインカードセクションのプロパティ
 type LoginCardsProps = {
   tournamentPasscode: string;
   setTournamentPasscode: (v: string) => void;
@@ -34,7 +35,9 @@ type LoginCardsProps = {
   activeTournament: Tournament | null | undefined;
 };
 
+// ログインカードセクションを返す
 export function LoginCardsSection(props: LoginCardsProps) {
+  // 大会を追加するボタン
   return (
     <>
       <div className="topCreateTournament">
@@ -42,9 +45,10 @@ export function LoginCardsSection(props: LoginCardsProps) {
           大会を追加する
         </button>
       </div>
-
+      // ログインカードセクション
       <section className="grid2 loginGrid">
         <div className="subgrid">
+          // 参加者ログインカード
           <div className="card">
             <h2>参加者</h2>
             <input
@@ -56,6 +60,7 @@ export function LoginCardsSection(props: LoginCardsProps) {
             <button onClick={props.onParticipantLogin}>確定（エントリー情報を入力する）</button>
           </div>
 
+          // 観戦者ログインカード
           <div className="card">
             <h2>観戦者</h2>
             <input
@@ -67,6 +72,7 @@ export function LoginCardsSection(props: LoginCardsProps) {
             <button onClick={props.onObserverLogin}>リアルタイム観戦する</button>
           </div>
 
+          // 管理者ログインカード
           <div className="card">
             <h2>管理者</h2>
             <input
@@ -79,6 +85,7 @@ export function LoginCardsSection(props: LoginCardsProps) {
           </div>
         </div>
 
+        // 現在の大会状況カード
         <div className="card">
           <h2>現在の大会状況</h2>
           {props.activeTournament ? (
@@ -91,6 +98,7 @@ export function LoginCardsSection(props: LoginCardsProps) {
         </div>
       </section>
 
+      // 大会を追加するモーダル
       {props.createModalOpen && (
         <div className="modalOverlay" onClick={() => props.setCreateModalOpen(false)}>
           <div className="modalCard" onClick={(e) => e.stopPropagation()}>

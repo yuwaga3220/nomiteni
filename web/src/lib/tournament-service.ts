@@ -1,17 +1,18 @@
-/**
- * トーナメント状態・試合進行（旧 TournamentService）
- */
+// web/src/lib/tournament-service.ts
+// トーナメント状態・試合進行（旧 TournamentService）
 import { MatchStatus, TournamentStatus, UserRole } from "@prisma/client";
 import { COURT_KEY } from "@/lib/config";
 import { getPrisma } from "@/lib/prisma";
 import { emitStateUpdate } from "@/lib/socket-registry";
 
+// 2の累乗を取得
 export function nextPowerOfTwo(n: number): number {
   let v = 1;
   while (v < n) v *= 2;
   return v;
 }
 
+// シャッフル
 export function shuffle<T>(items: T[]): T[] {
   const arr = [...items];
   for (let i = arr.length - 1; i > 0; i--) {
@@ -21,6 +22,7 @@ export function shuffle<T>(items: T[]): T[] {
   return arr;
 }
 
+// コート数を取得
 export async function getCourtCount(): Promise<number> {
   const prisma = getPrisma();
   const activeTournament = await getActiveTournament();
@@ -29,13 +31,15 @@ export async function getCourtCount(): Promise<number> {
   return Number(setting?.value ?? "2");
 }
 
+// 開催状況と参加者情報を含む状態を取得(大会の開催状況の公開用)
 export async function buildPublicState() {
   const prisma = getPrisma();
-  const activeTournament = await prisma.tournament.findFirst({
+  // prismaから現在開催中の大会を取得
+  const activeTournament = await prisma.tournament.findFirst({ 
     where: {
       status: { in: [TournamentStatus.DRAFT, TournamentStatus.RUNNING] },
-    },
-    orderBy: { createdAt: "desc" },
+    }, // 草稿または開催中の大会を取得
+    orderBy: { createdAt: "desc" }, // 作成日時で降順にソート
     select: {
       id: true,
       name: true,
@@ -44,7 +48,7 @@ export async function buildPublicState() {
       courtCount: true,
       status: true,
       matches: {
-        orderBy: [{ round: "asc" }, { position: "asc" }],
+        orderBy: [{ round: "asc" }, { position: "asc" }], // ラウンドと位置で昇順にソート
         select: {
           id: true,
           tournamentId: true,
@@ -60,9 +64,10 @@ export async function buildPublicState() {
     },
   });
 
+  // prismaから参加者を取得
   const users = await prisma.user.findMany({
     where: { role: UserRole.PARTICIPANT },
-    orderBy: [{ checkedIn: "desc" }, { name: "asc" }],
+    orderBy: [{ checkedIn: "desc" }, { name: "asc" }], // チェックイン日時で降順にソート、名前で昇順にソート
     select: {
       id: true,
       name: true,
@@ -73,10 +78,11 @@ export async function buildPublicState() {
     },
   });
 
-  const courtCount = await getCourtCount();
-  return { users, activeTournament, courtCount };
+  const courtCount = await getCourtCount(); // コート数を取得
+  return { users, activeTournament, courtCount }; // 状態を返す
 }
 
+// アクティブなトーナメントを取得
 export async function getActiveTournament() {
   const prisma = getPrisma();
   return prisma.tournament.findFirst({
@@ -85,10 +91,12 @@ export async function getActiveTournament() {
   });
 }
 
+// 公開状態をブロードキャスト
 export async function broadcastState() {
   emitStateUpdate(await buildPublicState());
 }
 
+// 勝者を次の試合に追加
 export async function attachWinnerToNext(matchId: number) {
   const prisma = getPrisma();
   const match = await prisma.match.findUnique({ where: { id: matchId } });
@@ -100,6 +108,7 @@ export async function attachWinnerToNext(matchId: number) {
   });
 }
 
+// 自動試合を解決
 export async function resolveAutomaticMatches(tournamentId: number) {
   const prisma = getPrisma();
   let changed = true;
@@ -137,6 +146,7 @@ export async function resolveAutomaticMatches(tournamentId: number) {
   }
 }
 
+// トーナメント状態を更新
 export async function updateTournamentStatus(tournamentId: number) {
   const prisma = getPrisma();
   const finalMatch = await prisma.match.findFirst({

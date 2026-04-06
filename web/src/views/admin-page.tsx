@@ -1,6 +1,5 @@
-/**
- * 管理者ページ
- */
+// web/src/views/admin-page.tsx
+// 管理者ページ
 "use client";
 
 import { useLayoutEffect } from "react";
@@ -9,8 +8,11 @@ import { AdminManagementSection, AdminMatchesSection, RealtimeSection, UserMenuS
 import { useNomiteni } from "@/context/NomiteniContext";
 import { api } from "@/lib/api";
 
+// 管理者ページ
 export function AdminPage() {
+  // ルーターを取得
   const router = useRouter();
+  // コンテキストを取得
   const {
     me,
     forceLoginCardsView,
@@ -45,13 +47,14 @@ export function AdminPage() {
   } = useNomiteni();
 
   const allowed = Boolean(me && !forceLoginCardsView && me.role === "ADMIN");
-
+  // 管理者ログインチェック
   useLayoutEffect(() => {
     if (!allowed) router.replace("/");
   }, [allowed, router]);
 
+  // 管理者ログインチェック
   if (!allowed || !me) return null;
-
+  // 管理者ページを返す
   return (
     <>
       <UserMenuSection
@@ -96,6 +99,7 @@ export function AdminPage() {
         entrySetPasscode={entrySetPasscode}
         setEntrySetPasscode={setEntrySetPasscode}
         checkinState={checkinState}
+        // トーナメント設定を保存
         onSaveTournamentSettings={() =>
           call(() =>
             api("/api/admin/tournaments/settings", {
@@ -111,6 +115,7 @@ export function AdminPage() {
             }),
           )
         }
+        // 参加者を準備状態にする
         onSetReady={(id: number) =>
           call(() =>
             api(`/api/admin/participants/${id}/checkin`, {
@@ -119,6 +124,7 @@ export function AdminPage() {
             }),
           )
         }
+        // 参加者を不在状態にする
         onSetAbsent={(id: number) =>
           call(() =>
             api(`/api/admin/participants/${id}/checkin`, {
@@ -127,6 +133,7 @@ export function AdminPage() {
             }),
           )
         }
+        // 参加者を未回答状態にする
         onSetUnanswered={(id: number) =>
           call(() =>
             api(`/api/admin/participants/${id}/checkin`, {
@@ -136,7 +143,9 @@ export function AdminPage() {
           )
         }
       />
+      // 試合を管理
       {active && (
+        // 試合を管理
         <AdminMatchesSection
           state={state}
           matches={assignableMatches}
@@ -149,7 +158,9 @@ export function AdminPage() {
               }),
             )
           }
+          // 試合を開始
           onStart={(matchId) => call(() => api(`/api/admin/matches/${matchId}/start`, { method: "POST" }))}
+          // 試合結果を登録
           onWin={(matchId, winnerId) =>
             call(() =>
               api(`/api/admin/matches/${matchId}/result`, {
@@ -160,6 +171,7 @@ export function AdminPage() {
           }
         />
       )}
+      // リアルタイムセクション
       <RealtimeSection
         active={active}
         state={state}

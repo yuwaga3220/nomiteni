@@ -1,7 +1,10 @@
+// web/src/lib/route-utils.ts
+// ルートユーティリティ
 import { NextResponse } from "next/server";
 import { ZodError } from "zod";
 import { HttpError } from "@/lib/http-error";
 
+// エラーを JSON に変換
 export function jsonFromError(e: unknown): NextResponse {
   if (e instanceof HttpError) {
     return NextResponse.json({ error: e.message }, { status: e.status });

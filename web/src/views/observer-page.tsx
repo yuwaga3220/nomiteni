@@ -1,6 +1,6 @@
-/**
- * 観戦者ページ
- */
+// web/src/views/observer-page.tsx
+// 観戦者ページ
+
 "use client";
 
 import { useLayoutEffect } from "react";
@@ -9,8 +9,11 @@ import { RealtimeSection, UserMenuSection } from "@/components/AppSections";
 import { useNomiteni } from "@/context/NomiteniContext";
 import { api } from "@/lib/api";
 
+// 観戦者ページ
 export function ObserverPage() {
+  // ルーターを取得
   const router = useRouter();
+  // コンテキストを取得
   const {
     me,
     forceLoginCardsView,
@@ -31,13 +34,15 @@ export function ObserverPage() {
   } = useNomiteni();
 
   const allowed = Boolean(me && !forceLoginCardsView && me.role === "OBSERVER");
-
+  // 観戦者ログインチェック
   useLayoutEffect(() => {
     if (!allowed) router.replace("/");
   }, [allowed, router]);
 
+  // 観戦者ログインチェック
   if (!allowed || !me) return null;
 
+  // 観戦者ページを返す
   return (
     <>
       <UserMenuSection

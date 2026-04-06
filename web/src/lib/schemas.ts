@@ -1,15 +1,20 @@
+// web/src/lib/schemas.ts
+// Zod スキーマ
 import { z } from "zod";
 
+// 参加者ログインスキーマ
 export const participantLoginSchema = z.object({
   email: z.email(),
   password: z.string().min(1),
 });
 
+// サインアップスキーマ
 export const signupSchema = z.object({
   email: z.email(),
   password: z.string().min(4).max(100),
 });
 
+// 参加者登録スキーマ
 export const entrySchema = z.object({
   tournamentPasscode: z.string().min(1),
   name: z.string().min(1),
@@ -17,34 +22,41 @@ export const entrySchema = z.object({
   note: z.string().max(300).optional(),
 });
 
+// 参加者登録パスコードのみスキーマ
 export const entryPasscodeOnlySchema = z.object({
   tournamentPasscode: z.string().min(1),
 });
 
+// 自己チェックインスキーマ
 export const selfCheckinSchema = z.object({
   canPlayToday: z.boolean(),
 });
 
+// 管理者ログインスキーマ
 export const adminLoginSchema = z.object({
   email: z.email(),
   password: z.string().min(1),
   passcode: z.string().min(1),
 });
 
+// 観客ログインスキーマ
 export const observerLoginSchema = z.object({
   email: z.email(),
   password: z.string().min(1),
   passcode: z.string().min(1),
 });
 
+// 観客パスコードスキーマ
 export const observerPasscodeSchema = z.object({
   passcode: z.string().min(4).max(64),
 });
 
+// 参加者パスコードスキーマ
 export const entryPasscodeSchema = z.object({
   passcode: z.string().min(4).max(64),
 });
 
+// トーナメント設定スキーマ
 export const tournamentSettingsSchema = z.object({
   name: z.string().min(1),
   eventDate: z.string().max(30).optional().nullable(),

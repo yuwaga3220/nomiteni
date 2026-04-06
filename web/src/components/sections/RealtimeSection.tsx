@@ -1,7 +1,5 @@
-/**
- * リアルタイム進行表示セクション
- */
-
+// web/src/components/sections/RealtimeSection.tsx
+// リアルタイム進行表示セクション
 "use client";
 
 import type { Match, PublicState, Tournament } from "@/types";
@@ -14,6 +12,7 @@ type RealtimeProps = {
   matchStatusLabel: (status: Match["status"]) => string;
 };
 
+// リアルタイム進行表示セクション
 export function RealtimeSection(props: RealtimeProps) {
   return (
     <section className="card">

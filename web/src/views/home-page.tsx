@@ -1,6 +1,5 @@
-/**
- * ホームページ
- */
+// web/src/views/home-page.tsx
+// ホームページ
 "use client";
 
 import { useLayoutEffect } from "react";
@@ -10,8 +9,11 @@ import { useNomiteni } from "@/context/NomiteniContext";
 import { api } from "@/lib/api";
 import type { TournamentBrief } from "@/types";
 
+// ホームページ
 export function HomePage() {
+  // ルーターを取得
   const router = useRouter();
+  // コンテキストを取得
   const {
     me,
     forceLoginCardsView,
@@ -51,15 +53,20 @@ export function HomePage() {
     refresh,
   } = useNomiteni();
 
+  // ホームページから移動するかどうか
   const shouldLeaveHome = Boolean(me && !forceLoginCardsView);
 
+  // マウント時の初期ページ遷移
   useLayoutEffect(() => {
     if (!shouldLeaveHome || !me) return;
+    // 移動先を設定
     const target =
       me.role === "PARTICIPANT" ? "/participant" : me.role === "ADMIN" ? "/admin" : "/observer";
+    // 移動先に移動
     router.replace(target);
-  }, [shouldLeaveHome, me, router]);
+  }, [shouldLeaveHome, me, router]); // マウント時に一度だけ実行
 
+  // 移動する場合
   if (shouldLeaveHome) {
     return <p className="message">ログイン先の画面へ移動しています…</p>;
   }
@@ -73,15 +80,15 @@ export function HomePage() {
         setAuthEmail={setAuthEmail}
         authPassword={authPassword}
         setAuthPassword={setAuthPassword}
-        onLogin={() => {
+        onLogin={() => { // ログインボタンをクリックした場合
           if (!authEmail || !authPassword) {
             setMessage("ログイン用のメールアドレスとパスワードを入力してください。");
             return;
           }
           setMessage("ログイン情報を入力しました。下のボタンで参加者/管理者/観戦者を選択してください。");
-          setAuthMode("none");
+          setAuthMode("none"); // 認証モードをリセット
         }}
-        onSignup={() =>
+        onSignup={() => // サインアップボタンをクリックした場合
           call(async () => {
             if (!authEmail || !authPassword) {
               throw new Error("サインアップ用のメールアドレスとパスワードを入力してください。");
@@ -90,7 +97,7 @@ export function HomePage() {
               method: "POST",
               body: JSON.stringify({ email: authEmail, password: authPassword }),
             });
-            setAuthMode("none");
+            setAuthMode("none"); // 認証モードをリセット
           })
         }
       />
@@ -101,10 +108,10 @@ export function HomePage() {
         setAdminPasscode={setAdminPasscode}
         observerLoginPasscode={observerLoginPasscode}
         setObserverLoginPasscode={setObserverLoginPasscode}
-        onRequestCreateTournament={() => {
+        onRequestCreateTournament={() => { // 大会作成ボタンをクリックした場合
           if (!isLoginReady) {
             setMessage("まずはログインしてください。");
-            setAuthMode("login");
+            setAuthMode("login"); // 認証モードをログインに設定
             return;
           }
           setCreateModalOpen(true);
@@ -124,41 +131,41 @@ export function HomePage() {
         createTournamentObserverPasscode={createTournamentObserverPasscode}
         setCreateTournamentObserverPasscode={setCreateTournamentObserverPasscode}
         activeTournament={active}
-        onParticipantLogin={() =>
+        onParticipantLogin={() => // 参加者ログインボタンをクリックした場合
           call(async () => {
-            ensureLoginCredentials();
+            ensureLoginCredentials(); // ログイン資格を確認
             if (!entryPasscode) throw new Error("大会パスコードを入力してください。");
-            await api("/api/auth/login", {
+            await api("/api/auth/login", { // APIを呼び出し、ログイン
               method: "POST",
               body: JSON.stringify({ email: authEmail, password: authPassword }),
             });
-            const preview = await api<{ tournament: TournamentBrief }>("/api/entry/preview", {
+            const preview = await api<{ tournament: TournamentBrief }>("/api/entry/preview", { // APIを呼び出し、大会情報を取得
               method: "POST",
               body: JSON.stringify({ tournamentPasscode: entryPasscode }),
             });
-            setEntryTournament(preview.tournament);
+            setEntryTournament(preview.tournament); 
             setForceLoginCardsView(false);
           })
         }
-        onAdminLogin={() =>
+        onAdminLogin={() => // 管理者ログインボタンをクリックした場合
           call(() => {
             ensureLoginCredentials();
-            return api("/api/auth/admin-login", {
+            return api("/api/auth/admin-login", { // APIを呼び出し、管理者ログイン
               method: "POST",
               body: JSON.stringify({ email: authEmail, password: authPassword, passcode: adminPasscode }),
             });
           })
         }
-        onObserverLogin={() =>
+        onObserverLogin={() => // 観戦者ログインボタンをクリックした場合
           call(() => {
             ensureLoginCredentials();
-            return api("/api/auth/observer-login", {
+            return api("/api/auth/observer-login", { // APIを呼び出し、観戦者ログイン
               method: "POST",
               body: JSON.stringify({ email: authEmail, password: authPassword, passcode: observerLoginPasscode }),
             });
           })
         }
-        onCreateTournament={() =>
+        onCreateTournament={() => // 大会作成ボタンをクリックした場合
           (async () => {
             try {
               ensureLoginCredentials();
@@ -166,10 +173,11 @@ export function HomePage() {
               if (!createTournamentEntryPasscode || !createTournamentObserverPasscode) {
                 throw new Error("大会/観戦パスコードを入力してください。");
               }
-              await api("/api/auth/login", {
+              await api("/api/auth/login", { // APIを呼び出し、ログイン
                 method: "POST",
                 body: JSON.stringify({ email: authEmail, password: authPassword }),
               });
+              // APIを呼び出し、大会を作成
               const created = await api<{ tournamentId: number; adminPasscode: string }>("/api/tournaments/create", {
                 method: "POST",
                 body: JSON.stringify({

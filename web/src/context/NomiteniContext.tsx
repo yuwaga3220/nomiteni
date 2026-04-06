@@ -1,7 +1,5 @@
-/**
- * コンテキスト
- */
-
+// web/src/context/NomiteniContext.tsx
+// コンテキスト
 "use client";
 
 import { createContext, useContext, type Dispatch, type SetStateAction } from "react";
@@ -75,12 +73,15 @@ export type NomiteniContextValue = {
   onHeaderLogout: () => void;
 };
 
+// コンテキストを作成
 const NomiteniContext = createContext<NomiteniContextValue | null>(null);
 
+// コンテキストを取得
 export function useNomiteni() {
   const v = useContext(NomiteniContext);
   if (!v) throw new Error("useNomiteni must be used within NomiteniProvider");
   return v;
 }
 
+// コンテキストをエクスポート
 export { NomiteniContext };

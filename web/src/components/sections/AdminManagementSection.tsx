@@ -1,11 +1,10 @@
-/**
- * 管理者メニューセクション
- */
-
+// web/src/components/sections/AdminManagementSection.tsx
+// 管理者メニューセクション
 "use client";
 
 import type { CheckinState, PublicState, Tournament, User } from "@/types";
 
+// 管理者メニューセクションのプロパティ
 type AdminManagementProps = {
   active: Tournament | null | undefined;
   state: PublicState | null;
@@ -28,7 +27,9 @@ type AdminManagementProps = {
   onSetUnanswered: (userId: number) => void;
 };
 
+// 管理者メニューセクション
 export function AdminManagementSection(props: AdminManagementProps) {
+  // 管理者メニューセクションを返す
   return (
     <section className="grid2">
       <div className="card">

@@ -1,6 +1,7 @@
-/**
- * アプリケーションセクション
- */
+// web/src/components/AppSections.tsx
+// アプリケーションセクション
+// 各セクションをexportする
+// home-page.tsxから呼び出される
 
 export { AuthModal, HeaderAuthButtons } from "./sections/HeaderAuth";
 export { LoginCardsSection } from "./sections/LoginCardsSection";

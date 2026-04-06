@@ -1,7 +1,6 @@
 /**
  * プロバイダー（コンテキストの提供）
  * コンテキストは、アプリケーションの状態を管理するためのものです。
- * コンテキストは、アプリケーションの状態を管理するためのものです。
  */
 
 "use client";
@@ -12,11 +11,15 @@ import { api, getSocket } from "@/lib/api";
 import type { AuthMode, CheckinState, Match, Me, PublicState, TournamentBrief, User } from "@/types";
 import { NomiteniContext, type NomiteniContextValue } from "@/context/NomiteniContext";
 
+// プロバイダーコンポーネント
 export function NomiteniProvider({ children }: { children: ReactNode }) {
+  // ルーターとパスを取得
   const router = useRouter();
   const pathname = usePathname();
 
+  // ユーザー情報を管理
   const [me, setMe] = useState<Me | null>(null);
+  // 状態を管理
   const [state, setState] = useState<PublicState | null>(null);
   const [message, setMessage] = useState<string>("");
   const [forceLoginCardsView, setForceLoginCardsView] = useState(false);
@@ -45,22 +48,27 @@ export function NomiteniProvider({ children }: { children: ReactNode }) {
   const [tournamentDate, setTournamentDate] = useState("");
   const [tournamentTimeSlot, setTournamentTimeSlot] = useState("");
   const [courtCountInput, setCourtCountInput] = useState(2);
+  // ログイン準備ができているかを管理
   const isLoginReady = Boolean(authEmail && authPassword);
+  // ログインしているか、またはログイン準備ができているかを管理
   const isHeaderLoggedIn = Boolean(me) || isLoginReady;
 
+  // ユーザーIDからユーザー情報を取得
   const usersById = useMemo(
     () => new Map((state?.users ?? []).map((u) => [u.id, u])),
     [state?.users],
   );
+  // 現在開催中の大会を取得
   const active = state?.activeTournament ?? null;
+  // 試合を割り当て可能な試合を取得
   const assignableMatches = (active?.matches ?? []).filter(
     (m) => m.status !== "COMPLETED" && m.player1Id && m.player2Id,
   );
-
+  // 状態を更新
   const refresh = async () => {
     const [{ user }, data] = await Promise.all([
-      api<{ user: Me | null }>("/api/auth/me"),
-      api<PublicState>("/api/public/state"),
+      api<{ user: Me | null }>("/api/auth/me"), // APIを呼び出し、ユーザー情報を取得
+      api<PublicState>("/api/public/state"), // APIを呼び出し、状態を取得
     ]);
     setMe(user);
     setState(data);
@@ -68,16 +76,17 @@ export function NomiteniProvider({ children }: { children: ReactNode }) {
     setMessage("");
   };
 
+  // マウント時に接続を確立し、アンマウント時に接続を解除
   useEffect(() => {
+    // キャンセルフラグを管理
     let cancelled = false;
+    // 状態を更新
     void refresh().catch((e: Error) => {
-      if (!cancelled) setMessage(e.message);
+      if (!cancelled) setMessage(e.message); // キャンセルフラグが立っていなければエラーメッセージを表示
     });
-
-    const socket = getSocket();
-
-    const onState = (next: PublicState) => setState(next);
-    const onConnectError = () => {
+    const socket = getSocket(); // Socket.IOを取得
+    const onState = (next: PublicState) => setState(next); // 状態を更新
+    const onConnectError = () => { // 接続エラーを管理
       if (cancelled) return;
       setMessage((prev) =>
         prev
@@ -85,34 +94,36 @@ export function NomiteniProvider({ children }: { children: ReactNode }) {
           : "リアルタイム接続に失敗しています。ターミナルに「ポート 3000 は既に使われています」と出ていれば、古い Node（next dev など）を止めてから npm run dev を1つだけ起動してください。next dev だけが動いていると Socket.IO がなく、画面の自動更新も止まります。",
       );
     };
-
-    socket.on("state:update", onState);
-    socket.on("connect_error", onConnectError);
-    socket.connect();
-
+    socket.on("state:update", onState); // 状態更新イベントを管理
+    socket.on("connect_error", onConnectError); // 接続エラーイベントを管理
+    socket.connect(); // Socket.IOを接続
+    // アンマウント時に実行
     return () => {
       cancelled = true;
       socket.off("state:update", onState);
       socket.off("connect_error", onConnectError);
       socket.disconnect();
     };
-  }, []);
+  }, []); // マウント時に一度だけ実行
 
+  // 参加者の情報を現在の値で更新
   useEffect(() => {
-    if (me?.role === "PARTICIPANT") {
+    if (me?.role === "PARTICIPANT") { // 参加者の場合
       setEntryName(me.name ?? "");
       setEntryParty(me.partyJoin);
       setEntryNote(me.note ?? "");
     }
-  }, [me]);
+  }, [me]); // ユーザー情報が変化したら
 
+  // 大会情報を更新
   useEffect(() => {
     setTournamentName(active?.name ?? "春シングルス大会");
     setTournamentDate(active?.eventDate ?? "");
     setTournamentTimeSlot(active?.timeSlot ?? "");
     setCourtCountInput(active?.courtCount ?? state?.courtCount ?? 2);
-  }, [active, state?.courtCount]);
+  }, [active, state?.courtCount]); // 大会情報が変化したら
 
+  // 管理者の情報を現在の値で更新
   useEffect(() => {
     if (me?.role !== "ADMIN") return;
     api<{
@@ -134,55 +145,63 @@ export function NomiteniProvider({ children }: { children: ReactNode }) {
         setObserverSetPasscode(tournament.observerPasscode ?? "");
       })
       .catch(() => undefined);
-  }, [me?.role]);
+  }, [me?.role]); // ユーザー情報が変化したら
 
+  // マウント時の初期ページ遷移
   useLayoutEffect(() => {
-    if (!me) {
+    if (!me) { // ユーザー情報がない場合
       if (pathname !== "/") router.replace("/");
       return;
     }
-    if (forceLoginCardsView) {
+    if (forceLoginCardsView) { // ログインカード表示モードの場合
       if (pathname !== "/") router.replace("/");
       return;
     }
+    // 移動先を設定
     const target =
       me.role === "PARTICIPANT" ? "/participant" : me.role === "ADMIN" ? "/admin" : "/observer";
     if (pathname !== target) router.replace(target);
-  }, [me, forceLoginCardsView, pathname, router]);
+  }, [me, forceLoginCardsView, pathname, router]); // マウント時に一度だけ実行
 
+  // プレイヤー名を取得
   const playerName = (id: number | null) => {
-    if (!id) return "BYE";
-    return usersById.get(id)?.name ?? `Player #${id}`;
+    if (!id) return "BYE"; // プレイヤーIDがない場合
+    return usersById.get(id)?.name ?? `Player #${id}`; // プレイヤー名を取得
   };
 
+  // 試合状態をラベル化
   const matchStatusLabel = (status: Match["status"]) => {
-    if (status === "PENDING") return "待機";
-    if (status === "ASSIGNED") return "予備";
-    if (status === "IN_PROGRESS") return "試合中";
-    return "終了";
+    if (status === "PENDING") return "待機"; // 待機状態
+    if (status === "ASSIGNED") return "予備"; // 予備状態
+    if (status === "IN_PROGRESS") return "試合中"; // 試合中状態
+    return "終了"; // 終了状態
   };
 
+  // 参加者のチェックイン状態を取得
   const checkinState = (u: User): CheckinState => {
     if (!u.checkedIn || u.canPlayToday === null) return "UNANSWERED";
     return u.canPlayToday ? "READY" : "ABSENT";
   };
 
+  // 非同期関数を呼び出し、更新してメッセージを表示
   const call = async (fn: () => Promise<unknown>) => {
     try {
-      await fn();
-      await refresh();
+      await fn(); // 非同期関数を呼び出し
+      await refresh(); // 状態を更新
       setMessage("更新しました。");
     } catch (e) {
       setMessage((e as Error).message);
     }
   };
 
+  // ログイン資格を確認
   const ensureLoginCredentials = () => {
     if (!authEmail || !authPassword) {
       throw new Error("まずはログインしてください。");
     }
   };
 
+  // 試合をグループ化
   const groupedRounds = useMemo(() => {
     const map = new Map<number, Match[]>();
     for (const m of active?.matches ?? []) {
@@ -191,7 +210,9 @@ export function NomiteniProvider({ children }: { children: ReactNode }) {
     return [...map.entries()].sort((a, b) => a[0] - b[0]);
   }, [active?.matches]);
 
+  // ヘッダーのログアウト
   const onHeaderLogout = () => {
+    // 認証モードをリセット
     setAuthMode("none");
     setAuthEmail("");
     setAuthPassword("");
@@ -205,6 +226,7 @@ export function NomiteniProvider({ children }: { children: ReactNode }) {
     setMessage("ログイン情報をクリアしました。");
   };
 
+  // コンテキストの値を設定
   const value: NomiteniContextValue = {
     me,
     setMe,
@@ -273,5 +295,6 @@ export function NomiteniProvider({ children }: { children: ReactNode }) {
     onHeaderLogout,
   };
 
-  return <NomiteniContext.Provider value={value}>{children}</NomiteniContext.Provider>;
+  // コンテキストの値を提供
+  return <NomiteniContext.Provider value={value}>{children}</NomiteniContext.Provider>; // コンテキストの値を提供
 }

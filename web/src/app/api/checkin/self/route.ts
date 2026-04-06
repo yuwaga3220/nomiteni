@@ -5,9 +5,10 @@ import { selfCheckinSchema } from "@/lib/schemas";
 import { requireParticipant } from "@/lib/session-guards";
 import { broadcastState } from "@/lib/tournament-service";
 
+// 自己チェックイン
 export async function POST(req: Request) {
   const guard = await requireParticipant();
-  if ("error" in guard) return guard.error;
+  if ("error" in guard) return guard.error; // ガードがエラーを返す場合
 
   const body: unknown = await req.json();
   const parsed = selfCheckinSchema.safeParse(body);
@@ -16,7 +17,7 @@ export async function POST(req: Request) {
   }
 
   const prisma = getPrisma();
-  const user = await prisma.user.update({
+  const user = await prisma.user.update({ // ユーザーを更新
     where: { id: guard.session.userId },
     data: { checkedIn: true, canPlayToday: parsed.data.canPlayToday },
   });

@@ -11,12 +11,6 @@ datasource db {
   provider = "sqlite"
 }
 
-enum UserRole {
-  PARTICIPANT
-  ADMIN
-  OBSERVER
-}
-
 enum TournamentStatus {
   DRAFT
   RUNNING
@@ -37,11 +31,11 @@ model User {
   name           String?
   partyJoin      Boolean  @default(false)
   note           String?
-  role           UserRole @default(PARTICIPANT)
   checkedIn      Boolean  @default(false)
   canPlayToday   Boolean?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+  adminOf        TournamentAdmin[]
 }
 
 model Tournament {
@@ -57,6 +51,7 @@ model Tournament {
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
   matches          Match[]
+  admins           TournamentAdmin[]
 }
 
 model Match {
@@ -83,4 +78,16 @@ model Match {
 model AppSetting {
   key   String @id
   value String
+}
+
+model TournamentAdmin {
+  id           Int        @id @default(autoincrement())
+  tournamentId Int
+  userId       Int
+  createdAt    DateTime   @default(now())
+
+  tournament Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([tournamentId, userId])
 }

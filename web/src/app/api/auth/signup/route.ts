@@ -1,4 +1,3 @@
-import { UserRole } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { getPrisma } from "@/lib/prisma";
 import { signupSchema } from "@/lib/schemas";
@@ -21,7 +20,6 @@ export async function POST(req: Request) {
     data: {
       email: parsed.data.email,
       password: parsed.data.password,
-      role: UserRole.PARTICIPANT,
     },
   });
   return NextResponse.json({ ok: true, userId: user.id }); // レスポンスを返す

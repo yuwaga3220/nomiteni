@@ -1,13 +1,13 @@
 /**
  * プロバイダー（コンテキストの提供）
- * コンテキストは、アプリケーションの状態を管理するためのものです。
+ * コンテキストは、アプリケーションの状態を管理するためのもの
  */
 
 "use client";
 
 import { useEffect, useLayoutEffect, useMemo, useState, type ReactNode } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { api, getSocket } from "@/lib/api";
+import { api, getSocket } from "@/lib/client/api";
 import type { AuthMode, CheckinState, Match, Me, PublicState, TournamentBrief, User } from "@/types";
 import { NomiteniContext, type NomiteniContextValue } from "@/context/NomiteniContext";
 
@@ -194,7 +194,7 @@ export function NomiteniProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  // ログイン資格を確認
+  // メールとパスワードが入力されているかを確認
   const ensureLoginCredentials = () => {
     if (!authEmail || !authPassword) {
       throw new Error("まずはログインしてください。");

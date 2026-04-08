@@ -1,6 +1,6 @@
 // web/src/lib/admin-scope.ts
 // 管理者 API の権限検証
-import { UserRole } from "@prisma/client"; // ユーザーロール
+
 import { NextResponse } from "next/server"; // Next.js のレスポンス
 import { getPrisma } from "@/lib/prisma"; // Prisma クライアント
 import { getSession } from "@/lib/session-cookie"; // セッションを取得
@@ -13,8 +13,8 @@ export async function requireScopedAdminTournament() {
   if (!session) {
     return { error: NextResponse.json({ error: "ログインが必要です。" }, { status: 401 }) };
   }
-  // 管理者ロールであるか確認
-  if (session.role !== UserRole.ADMIN) {
+  // 管理者セッションであるか確認
+  if (session.scope !== "admin") {
     return { error: NextResponse.json({ error: "管理者のみ実行できます。" }, { status: 403 }) };
   }
   // 大会が紐づいているか確認
@@ -32,6 +32,12 @@ export async function requireScopedAdminTournament() {
   // 大会が見つからない場合はエラー
   if (!tournament) {
     return { error: NextResponse.json({ error: "該当する大会が見つかりません。" }, { status: 404 }) };
+  }
+  const admin = await prisma.tournamentAdmin.findUnique({
+    where: { tournamentId_userId: { tournamentId: session.tournamentId, userId: session.userId } },
+  });
+  if (!admin) {
+    return { error: NextResponse.json({ error: "管理者権限がありません。" }, { status: 403 }) };
   }
   // セッションと大会を返す
   return { session, tournament };

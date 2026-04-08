@@ -1,5 +1,6 @@
 // web/src/lib/route-utils.ts
 // ルートユーティリティ
+
 import { NextResponse } from "next/server";
 import { ZodError } from "zod";
 import { HttpError } from "@/lib/http-error";

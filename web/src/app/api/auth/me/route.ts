@@ -8,10 +8,11 @@ import { getSession } from "@/lib/session-cookie";
 // ユーザー情報を取得
 export async function GET() {
   const session = await getSession(); // セッションを取得
-  if (!session) return NextResponse.json({ user: null }); // セッションがない場合はユーザー情報を返す
+  if (!session) return NextResponse.json({ user: null }); // セッションがない場合は何も返さない
+  if (session.scope === "login") return NextResponse.json({ user: null }); // ログイン中の場合は何も返さない
 
   const prisma = getPrisma(); // Prismaを取得
   const user = await prisma.user.findUnique({ where: { id: session.userId } }); // ユーザーを取得
   if (!user) return NextResponse.json({ user: null });
-  return NextResponse.json({ user: toClientUser({ ...user, role: session.role }) }); // ユーザー情報を返す
+  return NextResponse.json({ user: toClientUser({ ...user, scope: session.scope }) }); // ユーザー情報を返す
 }

@@ -124,6 +124,27 @@ button {
   color: #fff;
   border: none;
   cursor: pointer;
+  transition: background-color 0.16s ease, transform 0.08s ease;
+}
+
+button:hover {
+  background: #174187;
+}
+
+button:active {
+  background: #12336f;
+  transform: translateY(1px);
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+button:disabled:hover,
+button:disabled:active {
+  background: #1f4ea3;
+  transform: none;
 }
 
 .message {

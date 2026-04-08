@@ -1,10 +1,9 @@
-/**
- * JWT・ユーザー JSON（API 用）
- */
+// web/src/lib/auth-server.ts
+// JWT・ユーザー JSON（API 用）
+
 import jwt from "jsonwebtoken";
-import type { UserRole } from "@prisma/client";
 import { JWT_SECRET } from "@/lib/config";
-import type { SessionPayload } from "@/lib/session.types";
+import type { SessionPayload, SessionScope } from "@/lib/session.types";
 
 // セッショントークンを作成
 export function createToken(payload: SessionPayload): string {
@@ -31,8 +30,10 @@ export function toClientUser(user: {
   canPlayToday: boolean | null;
   createdAt: Date;
   updatedAt: Date;
-  role: UserRole;
+  scope?: SessionScope;
 }) {
+  const role =
+    user.scope === "admin" ? "ADMIN" : user.scope === "observer" ? "OBSERVER" : "PARTICIPANT";
   return {
     id: user.id,
     email: user.email,
@@ -43,6 +44,6 @@ export function toClientUser(user: {
     canPlayToday: user.canPlayToday,
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,
-    role: user.role,
+    role,
   };
 }

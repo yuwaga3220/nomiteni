@@ -12,10 +12,23 @@
 
 ## ディレクトリ構成（概要）
 
-| パス | 内容 |
-|------|------|
-| `web/` | Next.js アプリ本体。`server.ts` が起動エントリ、`src/app/api` が REST API、`prisma/` にスキーマ・マイグレーション |
-| ルート `package.json` | `npm run dev` は `web` のみ起動 |
+```text
+Nomiteni/                        
+├─ web/                         
+│  ├─ src/                       
+│  │  ├─ app/                    # App Router
+│  │  │  └─ api/                 # Route Handlers（REST API）
+│  │  ├─ components/             # UIコンポーネント
+│  │  ├─ views/                  # ページ単位の表示
+│  │  ├─ providers/              # 状態供給
+│  │  └─ lib/                    # クライアント/サーバー共通ユーティリティ
+│  │     ├─ client/              
+│  │     └─ server/             
+│  ├─ prisma/                   
+│  ├─ server.ts                  # Next.js + Socket.IO を同一ポートで起動するカスタムサーバー
+│  └─ package.json               
+└─ package.json                  
+```
 
 ## 起動・ビルド
 
@@ -43,6 +56,7 @@ npm run dev --prefix web
 ## 結果と今後の展望
 
 ## 技術的課題と解決策
+認証・認可処理
 
 ## 工夫・こだわり
 テニスサークルの大会や宴会への参加率を上げるためのポイント機能などのエンタメ性も高い機能も搭載すること。
@@ -52,7 +66,7 @@ npm run dev --prefix web
 ## 実装済み機能メモ
 
 - 大会エントリー（メールアドレスでログイン、名前・飲み会参加有無・備考入力）
-- 管理者ログイン（パスコード方式）
+- 認証フロー（`/api/auth/login` で事前ログイン後、`/api/auth/login/participant|observer|admin` で参加者/観戦者/管理者を選択）
 - 当日チェックイン（参加者自身 / 管理者代理）
 - トーナメント作成（管理者のみ、当日参加可のチェックイン済み参加者から自動生成）
 - 試合運営（コート数設定、試合カードのコート割り当て、開始、結果登録）

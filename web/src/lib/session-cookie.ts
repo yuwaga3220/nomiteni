@@ -1,5 +1,6 @@
 // web/src/lib/session-cookie.ts
 // Route Handler 用セッション（Cookie）
+
 import { cookies } from "next/headers";
 import { verifySessionToken } from "@/lib/auth-server";
 import type { SessionPayload } from "@/lib/session.types";

@@ -55,4 +55,4 @@ export type PublicState = {
 };
 
 export type CheckinState = "UNANSWERED" | "READY" | "ABSENT";
-export type AuthMode = "none" | "signup" | "login";
+export type AuthMode = "none" | "signup" | "login"; // 認証モード(モーダルの表示管理)

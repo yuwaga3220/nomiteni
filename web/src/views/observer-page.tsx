@@ -7,7 +7,7 @@ import { useLayoutEffect } from "react";
 import { useRouter } from "next/navigation";
 import { RealtimeSection, UserMenuSection } from "@/components/AppSections";
 import { useNomiteni } from "@/context/NomiteniContext";
-import { api } from "@/lib/api";
+import { api } from "@/lib/client/api";
 
 // 観戦者ページ
 export function ObserverPage() {

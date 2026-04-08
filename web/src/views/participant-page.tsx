@@ -7,7 +7,7 @@ import { useLayoutEffect } from "react";
 import { useRouter } from "next/navigation";
 import { UserMenuSection } from "@/components/AppSections";
 import { useNomiteni } from "@/context/NomiteniContext";
-import { api } from "@/lib/api";
+import { api } from "@/lib/client/api";
 
 // 参加者ページ
 export function ParticipantPage() {

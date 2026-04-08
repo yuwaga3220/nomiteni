@@ -1,6 +1,6 @@
 // web/src/lib/tournament-service.ts
 // トーナメント状態・試合進行（旧 TournamentService）
-import { MatchStatus, TournamentStatus, UserRole } from "@prisma/client";
+import { MatchStatus, TournamentStatus } from "@prisma/client";
 import { COURT_KEY } from "@/lib/config";
 import { getPrisma } from "@/lib/prisma";
 import { emitStateUpdate } from "@/lib/socket-registry";
@@ -66,7 +66,6 @@ export async function buildPublicState() {
 
   // prismaから参加者を取得
   const users = await prisma.user.findMany({
-    where: { role: UserRole.PARTICIPANT },
     orderBy: [{ checkedIn: "desc" }, { name: "asc" }], // チェックイン日時で降順にソート、名前で昇順にソート
     select: {
       id: true,

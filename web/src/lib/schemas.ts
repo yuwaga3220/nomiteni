@@ -1,5 +1,6 @@
 // web/src/lib/schemas.ts
 // Zod スキーマ
+
 import { z } from "zod";
 
 // 参加者ログインスキーマ
@@ -30,20 +31,6 @@ export const entryPasscodeOnlySchema = z.object({
 // 自己チェックインスキーマ
 export const selfCheckinSchema = z.object({
   canPlayToday: z.boolean(),
-});
-
-// 管理者ログインスキーマ
-export const adminLoginSchema = z.object({
-  email: z.email(),
-  password: z.string().min(1),
-  passcode: z.string().min(1),
-});
-
-// 観客ログインスキーマ
-export const observerLoginSchema = z.object({
-  email: z.email(),
-  password: z.string().min(1),
-  passcode: z.string().min(1),
 });
 
 // 観客パスコードスキーマ

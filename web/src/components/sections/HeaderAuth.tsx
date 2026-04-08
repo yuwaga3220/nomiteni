@@ -47,37 +47,51 @@ type AuthModalProps = {
 
 // 認証モーダルセクションを返す
 export function AuthModal(props: AuthModalProps) {
-  // 認証モードがない場合は何も表示しない
-  if (props.authMode === "none") return null;
-  // 認証モーダルセクションを返す
-  return (
-    <div className="modalOverlay" onClick={() => props.setAuthMode("none")}> // モーダル外クリックしたら認証モード解除
-      <div className="modalCard" onClick={(e) => e.stopPropagation()}> // モーダル内クリックしても親に伝えない
-        <h2>{props.authMode === "signup" ? "アカウント登録" : "ログイン情報入力"}</h2>
-        // メールアドレス入力
-        <input placeholder="メールアドレス"
-          value={props.authEmail} 
-          onChange={(e) => props.setAuthEmail(e.target.value)} 
-        />
-        // パスワード入力
-        <input
-          placeholder="パスワード"
-          type="password"
-          value={props.authPassword}
-          onChange={(e) => props.setAuthPassword(e.target.value)}
-        />
-        // ボタン表示
-        <div className="row">
-          {props.authMode === "signup" ? (
+  if (props.authMode === "none") return null; // 認証モードでない場合は何も表示しない
+  if (props.authMode === "signup") { // アカウント登録モーダル
+    return (
+      <div className="modalOverlay" onClick={() => props.setAuthMode("none")}>
+        <div className="modalCard" onClick={(e) => e.stopPropagation()}>
+          <h2>アカウント登録</h2>
+          <input placeholder="メールアドレス"
+            value={props.authEmail} 
+            onChange={(e) => props.setAuthEmail(e.target.value)} 
+          />
+          <input
+            placeholder="パスワード"
+            type="password"
+            value={props.authPassword}
+            onChange={(e) => props.setAuthPassword(e.target.value)}
+          />
+          <div className="row">
             <button onClick={props.onSignup}>登録する</button>
-          ) : (
-            <>
-              <button onClick={props.onLogin}>ログインする</button>
-            </>
-          )}
-          <button onClick={() => props.setAuthMode("none")}>閉じる</button>
-        </div>
+            <button onClick={() => props.setAuthMode("none")}>閉じる</button>
+          </div>
       </div>
     </div>
-  );
+    );
+  }
+  if (props.authMode === "login") { // ログインモーダル
+    return (
+      <div className="modalOverlay" onClick={() => props.setAuthMode("none")}>
+        <div className="modalCard" onClick={(e) => e.stopPropagation()}>
+          <h2>ログイン情報入力</h2>
+          <input placeholder="メールアドレス"
+            value={props.authEmail} 
+            onChange={(e) => props.setAuthEmail(e.target.value)} 
+          />
+          <input
+            placeholder="パスワード"
+            type="password"
+            value={props.authPassword}
+            onChange={(e) => props.setAuthPassword(e.target.value)}
+          />
+          <div className="row">
+            <button onClick={props.onLogin}>ログインする</button>
+            <button onClick={() => props.setAuthMode("none")}>閉じる</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 }

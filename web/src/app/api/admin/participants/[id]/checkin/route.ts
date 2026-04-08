@@ -1,6 +1,5 @@
 // web/src/app/api/admin/participants/[id]/checkin/route.ts
 // 参加者をチェックインする
-import { UserRole } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getPrisma } from "@/lib/prisma";
@@ -26,7 +25,7 @@ export async function POST(req: Request, ctx: RouteContext) {
 
   const prisma = getPrisma();
   const target = await prisma.user.findUnique({ where: { id } });
-  if (!target || target.role !== UserRole.PARTICIPANT) {
+  if (!target) {
     return NextResponse.json({ error: "参加者が見つかりません。" }, { status: 404 });
   }
 

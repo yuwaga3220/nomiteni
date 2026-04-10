@@ -34,8 +34,14 @@ export async function requireAdmin() {
     return { error: NextResponse.json({ error: "管理者のみ実行できます。" }, { status: 403 }) };
   }
   const prisma = getPrisma();
-  const admin = await prisma.tournamentAdmin.findUnique({
-    where: { tournamentId_userId: { tournamentId: session.tournamentId, userId: session.userId } },
+  const admin = await prisma.userTournamentRole.findUnique({
+    where: {
+      tournamentId_userId_role: {
+        tournamentId: session.tournamentId,
+        userId: session.userId,
+        role: "ADMIN",
+      },
+    },
   });
   if (!admin) {
     return { error: NextResponse.json({ error: "管理者権限がありません。" }, { status: 403 }) };

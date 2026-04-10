@@ -22,5 +22,6 @@ export async function POST(req: Request) {
       password: parsed.data.password,
     },
   });
+  
   return NextResponse.json({ ok: true, userId: user.id }); // レスポンスを返す
 }

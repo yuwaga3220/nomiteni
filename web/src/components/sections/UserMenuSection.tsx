@@ -3,7 +3,9 @@
 
 "use client";
 
+import { useState } from "react";
 import type { Me, TournamentBrief } from "@/types";
+import { useRouter } from "next/navigation";
 
 // ユーザーメニューセクションのプロパティ
 type UserMenuProps = {
@@ -23,6 +25,8 @@ type UserMenuProps = {
 
 // ユーザーメニューセクション
 export function UserMenuSection(props: UserMenuProps) {
+  const router = useRouter();
+  const [entryModalOpen, setEntryModalOpen] = useState(false);
   return (
     <section className="card">
       <h2>{props.me.role === "ADMIN" ? "管理者メニュー" : props.me.role === "PARTICIPANT" ? "参加者メニュー" : "観戦者メニュー"}</h2>
@@ -40,20 +44,39 @@ export function UserMenuSection(props: UserMenuProps) {
           ) : (
             <p>対象大会情報を読み込めませんでした。ログアウトして再度エントリーしてください。</p>
           )}
-          <input placeholder="選手名" value={props.entryName} onChange={(e) => props.setEntryName(e.target.value)} />
-          <label>
-            <input type="checkbox" checked={props.entryParty} onChange={(e) => props.setEntryParty(e.target.checked)} />
-            飲み会に参加する
-          </label>
-          <textarea placeholder="意気込み" value={props.entryNote} onChange={(e) => props.setEntryNote(e.target.value)} />
-          <button onClick={props.onEntrySubmit}>エントリーする</button>
+          <button onClick={() => setEntryModalOpen(true)}>エントリー入力を開く</button>
           <h3>当日チェックイン</h3>
           <button onClick={props.onCheckinJoin}>参加する</button>
           <button onClick={props.onCheckinAbsent}>欠席する</button>
         </div>
       )}
+      {/* 参加者の場合、エントリー入力モーダルを表示 */}
+      {props.me.role === "PARTICIPANT" && entryModalOpen && (
+        <div className="modalOverlay" onClick={() => setEntryModalOpen(false)}>
+          <div className="modalCard" onClick={(e) => e.stopPropagation()}>
+            <h3>大会エントリー</h3>
+            <input placeholder="選手名" value={props.entryName} onChange={(e) => props.setEntryName(e.target.value)} />
+            <label>
+              <input type="checkbox" checked={props.entryParty} onChange={(e) => props.setEntryParty(e.target.checked)} />
+              飲み会に参加する
+            </label>
+            <textarea placeholder="意気込み" value={props.entryNote} onChange={(e) => props.setEntryNote(e.target.value)} />
+            <div className="row">
+              <button
+                onClick={() => {
+                  props.onEntrySubmit();
+                  setEntryModalOpen(false);
+                }}
+              >
+                エントリーする
+              </button>
+              <button onClick={() => setEntryModalOpen(false)}>閉じる</button>
+            </div>
+          </div>
+        </div>
+      )}
       <br />
-      <button onClick={props.onLogout}>ログアウト</button>
+      <button onClick={() => router.push("/")}>戻る</button>
     </section>
   );
 }

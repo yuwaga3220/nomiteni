@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { toClientUser } from "@/lib/auth-server";
+import { createToken, toClientUser } from "@/lib/auth-server";
 import { getPrisma } from "@/lib/prisma";
 import { entrySchema } from "@/lib/schemas";
 import { requireParticipant } from "@/lib/session-guards";
@@ -33,6 +33,30 @@ export async function POST(req: Request) {
       note: parsed.data.note,
     },
   });
+  await prisma.userTournamentRole.upsert({ // ユーザーの大会役割を更新
+    where: {
+      tournamentId_userId_role: {
+        tournamentId: activeTournament.id,
+        userId: guard.session.userId,
+        role: "PARTICIPANT",
+      },
+    },
+    create: {
+      tournamentId: activeTournament.id,
+      userId: guard.session.userId,
+      role: "PARTICIPANT",
+    },
+    update: {},
+  });
+  
   await broadcastState(); // 状態をブロードキャスト
-  return NextResponse.json({ user: toClientUser(user) });
+  const res = NextResponse.json({
+    user: toClientUser({ ...user, scope: "participant" }),
+  });
+  res.cookies.set("nomiteni_token", createToken({ userId: user.id, scope: "participant" }), {
+    httpOnly: true,
+    sameSite: "lax",
+    path: "/",
+  });
+  return res;
 }

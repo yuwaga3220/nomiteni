@@ -39,6 +39,22 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "ユーザーが見つかりません。" }, { status: 404 });
   }
 
+  await prisma.userTournamentRole.upsert({
+    where: {
+      tournamentId_userId_role: {
+        tournamentId: activeTournament.id,
+        userId: user.id,
+        role: "OBSERVER",
+      },
+    },
+    create: {
+      tournamentId: activeTournament.id,
+      userId: user.id,
+      role: "OBSERVER",
+    },
+    update: {},
+  });
+  
   const res = NextResponse.json({
     user: toClientUser({ ...user, scope: "observer" }),
   });

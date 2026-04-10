@@ -60,8 +60,12 @@ body {
   justify-content: center;
 }
 
+.topActionRow {
+  gap: 24px;
+}
+
 .bigCreateTournamentButton {
-  min-width: 320px;
+  min-width: 300px;
   padding: 18px 24px;
   font-size: 20px;
   font-weight: 700;
@@ -168,6 +172,10 @@ button:disabled:active {
   align-items: center;
   gap: 8px;
   flex-wrap: wrap;
+}
+
+.row.topActionRow {
+  gap: 24px;
 }
 
 .rounds {

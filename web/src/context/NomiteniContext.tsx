@@ -13,8 +13,8 @@ export type NomiteniContextValue = {
   setMessage: Dispatch<SetStateAction<string>>;
   forceLoginCardsView: boolean;
   setForceLoginCardsView: Dispatch<SetStateAction<boolean>>;
-  authMode: AuthMode;
-  setAuthMode: Dispatch<SetStateAction<AuthMode>>;
+  authModalState: AuthMode;
+  setAuthModalState: Dispatch<SetStateAction<AuthMode>>;
   authEmail: string;
   setAuthEmail: Dispatch<SetStateAction<string>>;
   authPassword: string;

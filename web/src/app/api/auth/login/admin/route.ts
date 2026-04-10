@@ -31,9 +31,15 @@ export async function POST(req: Request) {
   if (!tournament) {
     return NextResponse.json({ error: "管理者パスコードが違います。" }, { status: 401 });
   }
-  await prisma.tournamentAdmin.upsert({
-    where: { tournamentId_userId: { tournamentId: tournament.id, userId: user.id } },
-    create: { tournamentId: tournament.id, userId: user.id },
+  await prisma.userTournamentRole.upsert({
+    where: {
+      tournamentId_userId_role: {
+        tournamentId: tournament.id,
+        userId: user.id,
+        role: "ADMIN",
+      },
+    },
+    create: { tournamentId: tournament.id, userId: user.id, role: "ADMIN" },
     update: {},
   });
 

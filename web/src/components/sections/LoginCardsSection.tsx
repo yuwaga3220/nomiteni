@@ -9,14 +9,28 @@ import type { Tournament } from "@/types";
 type LoginCardsProps = {
   tournamentPasscode: string;
   setTournamentPasscode: (v: string) => void;
+  entryName: string;
+  setEntryName: (v: string) => void;
+  entryParty: boolean;
+  setEntryParty: (v: boolean) => void;
+  entryNote: string;
+  setEntryNote: (v: string) => void;
   adminPasscode: string;
   setAdminPasscode: (v: string) => void;
   observerLoginPasscode: string;
   setObserverLoginPasscode: (v: string) => void;
-  onParticipantLogin: () => void;
+  onParticipantOpen: () => void;
+  participantSelectModalOpen: boolean;
+  setParticipantSelectModalOpen: (v: boolean) => void;
+  participantTournaments: Array<{ id: number; name: string; status: string; eventDate?: string | null }>;
+  onSelectParticipantTournament: (tournamentId: number) => void;
   onAdminLogin: () => void;
   onObserverLogin: () => void;
   onRequestCreateTournament: () => void;
+  onRequestEntryTournament: () => void;
+  entryModalOpen: boolean;
+  setEntryModalOpen: (v: boolean) => void;
+  onEntryTournament: () => void;
   createModalOpen: boolean;
   setCreateModalOpen: (v: boolean) => void;
   createTournamentName: string;
@@ -41,25 +55,24 @@ export function LoginCardsSection(props: LoginCardsProps) {
   return (
     <>
       <div className="topCreateTournament">
-        <button className="bigCreateTournamentButton" onClick={props.onRequestCreateTournament}>
-          大会を追加する
-        </button>
+        <div className="row topActionRow">
+          <button className="bigCreateTournamentButton" onClick={props.onRequestCreateTournament}>
+            大会を追加する
+          </button>
+          <button className="bigCreateTournamentButton" onClick={props.onRequestEntryTournament}>
+            大会にエントリーする
+          </button>
+        </div>
       </div>
       <section className="grid2 loginGrid">
         <div className="subgrid">
           <div className="card">
-            <h2>参加者</h2>
-            <input
-              placeholder="大会パスコード"
-              type="password"
-              value={props.tournamentPasscode}
-              onChange={(e) => props.setTournamentPasscode(e.target.value)}
-            />
-            <button onClick={props.onParticipantLogin}>確定（エントリー情報を入力する）</button>
+            <h2>エントリー済みの方はこちら</h2>
+            <button onClick={props.onParticipantOpen}>大会用ページへ移動する</button>
           </div>
 
           <div className="card">
-            <h2>観戦者</h2>
+            <h2>リアルタイムで試合観戦する</h2>
             <input
               placeholder="観戦パスコード"
               type="password"
@@ -70,9 +83,9 @@ export function LoginCardsSection(props: LoginCardsProps) {
           </div>
 
           <div className="card">
-            <h2>管理者</h2>
+            <h2>大会運営者はこちら</h2>
             <input
-              placeholder="管理者パスコード"
+              placeholder="運営パスコード"
               type="password"
               value={props.adminPasscode}
               onChange={(e) => props.setAdminPasscode(e.target.value)}
@@ -126,6 +139,50 @@ export function LoginCardsSection(props: LoginCardsProps) {
             <div className="row">
               <button onClick={props.onCreateTournament}>大会を追加する</button>
               <button onClick={() => props.setCreateModalOpen(false)}>閉じる</button>
+            </div>
+          </div>
+        </div>
+      )}
+      {props.entryModalOpen && (
+        <div className="modalOverlay" onClick={() => props.setEntryModalOpen(false)}>
+          <div className="modalCard" onClick={(e) => e.stopPropagation()}>
+            <h2>大会にエントリー</h2>
+            <input
+              placeholder="大会パスコード"
+              type="password"
+              value={props.tournamentPasscode}
+              onChange={(e) => props.setTournamentPasscode(e.target.value)}
+            />
+            <input placeholder="選手名" value={props.entryName} onChange={(e) => props.setEntryName(e.target.value)} />
+            <label>
+              <input type="checkbox" checked={props.entryParty} onChange={(e) => props.setEntryParty(e.target.checked)} />
+              飲み会に参加する
+            </label>
+            <textarea placeholder="意気込み" value={props.entryNote} onChange={(e) => props.setEntryNote(e.target.value)} />
+            <div className="row">
+              <button onClick={props.onEntryTournament}>エントリーする</button>
+              <button onClick={() => props.setEntryModalOpen(false)}>閉じる</button>
+            </div>
+          </div>
+        </div>
+      )}
+      {props.participantSelectModalOpen && (
+        <div className="modalOverlay" onClick={() => props.setParticipantSelectModalOpen(false)}>
+          <div className="modalCard" onClick={(e) => e.stopPropagation()}>
+            <h2>参加する大会を選択</h2>
+            {props.participantTournaments.length > 0 ? (
+              <div className="subgrid">
+                {props.participantTournaments.map((t) => (
+                  <button key={t.id} onClick={() => props.onSelectParticipantTournament(t.id)}>
+                    {t.name} ({t.status}) / 開催日: {t.eventDate || "-"}
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <p>参加者として紐づく大会がありません。</p>
+            )}
+            <div className="row">
+              <button onClick={() => props.setParticipantSelectModalOpen(false)}>閉じる</button>
             </div>
           </div>
         </div>

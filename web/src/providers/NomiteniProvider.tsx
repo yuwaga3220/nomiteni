@@ -24,7 +24,7 @@ export function NomiteniProvider({ children }: { children: ReactNode }) {
   const [message, setMessage] = useState<string>("");
   const [forceLoginCardsView, setForceLoginCardsView] = useState(false);
 
-  const [authMode, setAuthMode] = useState<AuthMode>("none");
+  const [authModalState, setAuthModalState] = useState<AuthMode>("none");
   const [authEmail, setAuthEmail] = useState("");
   const [authPassword, setAuthPassword] = useState("");
   const [entryPasscode, setEntryPasscode] = useState("");
@@ -48,10 +48,12 @@ export function NomiteniProvider({ children }: { children: ReactNode }) {
   const [tournamentDate, setTournamentDate] = useState("");
   const [tournamentTimeSlot, setTournamentTimeSlot] = useState("");
   const [courtCountInput, setCourtCountInput] = useState(2);
+
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   // ログイン準備ができているかを管理
   const isLoginReady = Boolean(authEmail && authPassword);
-  // ログインしているか、またはログイン準備ができているかを管理
-  const isHeaderLoggedIn = Boolean(me) || isLoginReady;
+  // ログイン中かどうかを管理
+  const isHeaderLoggedIn = isLoggedIn;
 
   // ユーザーIDからユーザー情報を取得
   const usersById = useMemo(
@@ -66,11 +68,12 @@ export function NomiteniProvider({ children }: { children: ReactNode }) {
   );
   // 状態を更新
   const refresh = async () => {
-    const [{ user }, data] = await Promise.all([
-      api<{ user: Me | null }>("/api/auth/me"), // APIを呼び出し、ユーザー情報を取得
+    const [{ user, isLoggedIn }, data] = await Promise.all([
+      api<{ user: Me | null; isLoggedIn: boolean }>("/api/auth/me"), // APIを呼び出し、ユーザー情報を取得
       api<PublicState>("/api/public/state"), // APIを呼び出し、状態を取得
     ]);
     setMe(user);
+    setIsLoggedIn(isLoggedIn);
     setState(data);
     setCourtCountInput(data.courtCount);
     setMessage("");
@@ -150,7 +153,8 @@ export function NomiteniProvider({ children }: { children: ReactNode }) {
   // マウント時の初期ページ遷移
   useLayoutEffect(() => {
     if (!me) { // ユーザー情報がない場合
-      if (pathname !== "/") router.replace("/");
+      const allowParticipantEntry = pathname === "/participant" && isHeaderLoggedIn && !forceLoginCardsView;
+      if (!allowParticipantEntry && pathname !== "/") router.replace("/");
       return;
     }
     if (forceLoginCardsView) { // ログインカード表示モードの場合
@@ -159,9 +163,9 @@ export function NomiteniProvider({ children }: { children: ReactNode }) {
     }
     // 移動先を設定
     const target =
-      me.role === "PARTICIPANT" ? "/participant" : me.role === "ADMIN" ? "/admin" : "/observer";
+      me.role === "PARTICIPANT" ? "/" : me.role === "ADMIN" ? "/admin" : "/observer";
     if (pathname !== target) router.replace(target);
-  }, [me, forceLoginCardsView, pathname, router]); // マウント時に一度だけ実行
+  }, [me, isHeaderLoggedIn, forceLoginCardsView, pathname, router]); // マウント時に一度だけ実行
 
   // プレイヤー名を取得
   const playerName = (id: number | null) => {
@@ -213,13 +217,13 @@ export function NomiteniProvider({ children }: { children: ReactNode }) {
   // ヘッダーのログアウト
   const onHeaderLogout = () => {
     // 認証モードをリセット
-    setAuthMode("none");
+    setAuthModalState("none");
     setAuthEmail("");
     setAuthPassword("");
     setEntryTournament(null);
     setCreateModalOpen(false);
     setForceLoginCardsView(false);
-    if (me) {
+    if (me || isLoggedIn) {
       void call(() => api("/api/auth/logout", { method: "POST" }));
       return;
     }
@@ -235,8 +239,8 @@ export function NomiteniProvider({ children }: { children: ReactNode }) {
     setMessage,
     forceLoginCardsView,
     setForceLoginCardsView,
-    authMode,
-    setAuthMode,
+    authModalState,
+    setAuthModalState,
     authEmail,
     setAuthEmail,
     authPassword,

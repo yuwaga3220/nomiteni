@@ -4,7 +4,7 @@
 
 import { useLayoutEffect } from "react";
 import { useRouter } from "next/navigation";
-import { AdminManagementSection, AdminMatchesSection, RealtimeSection, UserMenuSection } from "@/components/AppSections";
+import { AdminManagementSection, AdminMatchesSection, RealtimeSection, UserMenuSection } from "@/components/sections/AppSections";
 import { useNomiteni } from "@/context/NomiteniContext";
 import { api } from "@/lib/client/api";
 

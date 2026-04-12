@@ -2,13 +2,12 @@ import { NextResponse } from "next/server";
 import { createToken, toClientUser } from "@/lib/auth-server";
 import { getPrisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session-cookie";
-import { broadcastState } from "@/lib/tournament-service";
 
-// 参加者ログイン（事前ログイン済みユーザー向け）
+// ホーム用: セッションを scope: login（tournamentId なし）に正規化
 export async function POST() {
   const session = await getSession();
   if (!session) {
-    return NextResponse.json({ error: "先にログインしてください。" }, { status: 401 });
+    return NextResponse.json({ error: "ログインが必要です。" }, { status: 401 });
   }
 
   const prisma = getPrisma();
@@ -17,14 +16,22 @@ export async function POST() {
     return NextResponse.json({ error: "ユーザーが見つかりません。" }, { status: 404 });
   }
 
+  const atLoginHub = session.scope === "login" && session.tournamentId === undefined;
+  if (atLoginHub) {
+    return NextResponse.json({
+      ok: true,
+      user: toClientUser({ ...user, scope: "login" }),
+    });
+  }
+
   const res = NextResponse.json({
-    user: toClientUser({ ...user, scope: "participant" }),
+    ok: true,
+    user: toClientUser({ ...user, scope: "login" }),
   });
-  res.cookies.set("nomiteni_token", createToken({ userId: user.id, scope: "participant" }), {
+  res.cookies.set("nomiteni_token", createToken({ userId: user.id, scope: "login" }), {
     httpOnly: true,
     sameSite: "lax",
     path: "/",
   });
-  await broadcastState();
   return res;
 }

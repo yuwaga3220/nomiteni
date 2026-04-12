@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import { getPrisma } from "@/lib/prisma";
-import { requireParticipant } from "@/lib/session-guards";
+import { requireAnySession } from "@/lib/session-guards";
 
 // 参加者として紐づいている大会一覧を取得
 export async function GET() {
-  const guard = await requireParticipant();
+  const guard = await requireAnySession();
   if ("error" in guard) return guard.error;
 
   const prisma = getPrisma();

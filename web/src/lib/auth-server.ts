@@ -33,7 +33,13 @@ export function toClientUser(user: {
   scope?: SessionScope;
 }) {
   const role =
-    user.scope === "admin" ? "ADMIN" : user.scope === "observer" ? "OBSERVER" : "PARTICIPANT";
+    user.scope === "admin"
+      ? "ADMIN"
+      : user.scope === "observer"
+        ? "OBSERVER"
+        : user.scope === "login"
+          ? "LOGIN"
+          : "PARTICIPANT";
   return {
     id: user.id,
     email: user.email,

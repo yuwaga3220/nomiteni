@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 import { UserRole } from "@prisma/client";
 import { getPrisma } from "@/lib/prisma";
-import { requireParticipant } from "@/lib/session-guards";
+import { requireAnySession } from "@/lib/session-guards";
 
 // 参加者が選択した大会のリアルタイム状態を取得
 export async function GET(req: Request) {
-  const guard = await requireParticipant();
+  const guard = await requireAnySession();
   if ("error" in guard) return guard.error;
 
   const url = new URL(req.url);

@@ -1,18 +1,18 @@
 import { NextResponse } from "next/server";
 import { createToken } from "@/lib/auth-server";
 import { getPrisma } from "@/lib/prisma";
-import { participantLoginSchema } from "@/lib/schemas";
+import { loginSchema } from "@/lib/schemas";
 
-// 汎用ログイン（登録済みアカウント確認）
+// ログイン
 export async function POST(req: Request) {
   const body: unknown = await req.json();
-  const parsed = participantLoginSchema.safeParse(body); // ログイン入力をパース
+  const parsed = loginSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }
 
   const prisma = getPrisma();
-  // ユニークなメールアドレスのユーザーを取得
+  // メアドが一致するユーザーを取得
   const user = await prisma.user.findUnique({ where: { email: parsed.data.email } });
   if (!user) {
     return NextResponse.json(
@@ -20,16 +20,17 @@ export async function POST(req: Request) {
       { status: 404 },
     );
   }
-  // パスワードが一致しない場合はエラーを返す
+  // パスワード認証
   if (user.password !== parsed.data.password) {
     return NextResponse.json({ error: "パスワードが違います。" }, { status: 401 });
   }
-
+  // 認証成功時にトークンを発行
   const res = NextResponse.json({ ok: true, userId: user.id });
   res.cookies.set("nomiteni_token", createToken({ userId: user.id, scope: "login" }), {
     httpOnly: true,
     sameSite: "lax",
     path: "/",
   });
+  // レスポンスを返す
   return res;
 }

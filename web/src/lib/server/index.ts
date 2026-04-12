@@ -12,14 +12,14 @@ export {
   entryPasscodeOnlySchema,
   entryPasscodeSchema,
   entrySchema,
+  loginSchema,
   observerPasscodeSchema,
-  participantLoginSchema,
   selfCheckinSchema,
   signupSchema,
   tournamentSettingsSchema,
 } from "@/lib/schemas";
 export { getSession } from "@/lib/session-cookie";
-export { requireAdmin, requireAnySession, requireParticipant } from "@/lib/session-guards";
+export { requireAdmin, requireAnySession } from "@/lib/session-guards";
 export type { SessionPayload } from "@/lib/session.types";
 export { emitStateUpdate, setIo } from "@/lib/socket-registry";
 export { createTournamentWithSettings } from "@/lib/tournament-create";
@@ -27,6 +27,7 @@ export {
   attachWinnerToNext,
   broadcastState,
   buildPublicState,
+  findActiveTournamentByEntryPasscode,
   getActiveTournament,
   getCourtCount,
   nextPowerOfTwo,

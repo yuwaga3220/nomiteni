@@ -15,10 +15,10 @@ export function ParticipantPage() {
   const searchParams = useSearchParams();
   const [state, setState] = useState<PublicState | null>(null);
 
-  const { me, isHeaderLoggedIn, forceLoginCardsView, setMessage, matchStatusLabel } = useNomiteni();
+  const { me, forceLoginCardsView, setMessage, matchStatusLabel } = useNomiteni();
 
   const tournamentId = Number(searchParams.get("tournamentId"));
-  const allowed = Boolean(!forceLoginCardsView && (me?.role === "PARTICIPANT" || isHeaderLoggedIn));
+  const allowed = Boolean(!forceLoginCardsView && me?.role === "PARTICIPANT");
 
   // 参加者ページのログインチェック
   useLayoutEffect(() => {

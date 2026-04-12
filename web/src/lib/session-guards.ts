@@ -5,18 +5,8 @@ import { NextResponse } from "next/server";
 import { getPrisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session-cookie";
 
-// 任意のセッション
+// ログイン済みセッション必須（スコープは問わない）
 export async function requireAnySession() {
-  const session = await getSession();
-  if (!session) {
-    return { error: NextResponse.json({ error: "ログインが必要です。" }, { status: 401 }) };
-  }
-  return { session };
-}
-
-// 参加者のみ実行できるセッション
-export async function requireParticipant() {
-  // Cookie からセッションを取得
   const session = await getSession();
   if (!session) {
     return { error: NextResponse.json({ error: "ログインが必要です。" }, { status: 401 }) };
@@ -26,10 +16,9 @@ export async function requireParticipant() {
 
 // 管理者のみ実行できるセッション
 export async function requireAdmin() {
-  const session = await getSession();
-  if (!session) {
-    return { error: NextResponse.json({ error: "ログインが必要です。" }, { status: 401 }) };
-  }
+  const guard = await requireAnySession();
+  if ("error" in guard) return guard;
+  const { session } = guard;
   if (session.scope !== "admin" || !session.tournamentId) {
     return { error: NextResponse.json({ error: "管理者のみ実行できます。" }, { status: 403 }) };
   }

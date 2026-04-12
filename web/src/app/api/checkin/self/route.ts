@@ -2,12 +2,12 @@ import { NextResponse } from "next/server";
 import { toClientUser } from "@/lib/auth-server";
 import { getPrisma } from "@/lib/prisma";
 import { selfCheckinSchema } from "@/lib/schemas";
-import { requireParticipant } from "@/lib/session-guards";
+import { requireAnySession } from "@/lib/session-guards";
 import { broadcastState } from "@/lib/tournament-service";
 
 // 自己チェックイン
 export async function POST(req: Request) {
-  const guard = await requireParticipant();
+  const guard = await requireAnySession();
   if ("error" in guard) return guard.error; // ガードがエラーを返す場合
 
   const body: unknown = await req.json();

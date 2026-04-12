@@ -3,8 +3,8 @@
 
 import { z } from "zod";
 
-// 参加者ログインスキーマ
-export const participantLoginSchema = z.object({
+// アカウント（メール／パスワード）ログインスキーマ
+export const loginSchema = z.object({
   email: z.email(),
   password: z.string().min(1),
 });

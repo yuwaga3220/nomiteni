@@ -150,22 +150,33 @@ export function NomiteniProvider({ children }: { children: ReactNode }) {
       .catch(() => undefined);
   }, [me?.role]); // ユーザー情報が変化したら
 
-  // マウント時の初期ページ遷移
+  // ロールに応じた許可パスへ誘導（ADMIN/OBSERVER はホーム / も利用可）
   useLayoutEffect(() => {
-    if (!me) { // ユーザー情報がない場合
-      const allowParticipantEntry = pathname === "/participant" && isHeaderLoggedIn && !forceLoginCardsView;
-      if (!allowParticipantEntry && pathname !== "/") router.replace("/");
-      return;
-    }
-    if (forceLoginCardsView) { // ログインカード表示モードの場合
+    if (!me) {
+      // /me 取得前は /participant に留め、取得後にロールで振り分ける
+      if (pathname === "/participant" && !forceLoginCardsView) return;
       if (pathname !== "/") router.replace("/");
       return;
     }
-    // 移動先を設定
-    const target =
-      me.role === "PARTICIPANT" ? "/" : me.role === "ADMIN" ? "/admin" : "/observer";
-    if (pathname !== target) router.replace(target);
-  }, [me, isHeaderLoggedIn, forceLoginCardsView, pathname, router]); // マウント時に一度だけ実行
+    if (forceLoginCardsView) {
+      if (pathname !== "/") router.replace("/");
+      return;
+    }
+    if (me.role === "ADMIN") {
+      if (pathname !== "/" && pathname !== "/admin") router.replace("/");
+      return;
+    }
+    if (me.role === "OBSERVER") {
+      if (pathname !== "/" && pathname !== "/observer") router.replace("/");
+      return;
+    }
+    if (me.role === "LOGIN") {
+      if (pathname !== "/") router.replace("/");
+      return;
+    }
+    // PARTICIPANT
+    if (pathname !== "/" && pathname !== "/participant") router.replace("/");
+  }, [me, forceLoginCardsView, pathname, router]);
 
   // プレイヤー名を取得
   const playerName = (id: number | null) => {

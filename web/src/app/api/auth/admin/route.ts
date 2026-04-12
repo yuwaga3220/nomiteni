@@ -4,11 +4,11 @@ import { createToken, toClientUser } from "@/lib/auth-server";
 import { getPrisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session-cookie";
 
-const loginAdminSchema = z.object({
+const adminPasscodeSchema = z.object({
   passcode: z.string().min(1),
 });
 
-// 管理者ログイン（事前ログイン済みユーザー向け）
+// 管理者パスコードで大会コンテキストに入る（アカウントログイン済み必須）
 export async function POST(req: Request) {
   const session = await getSession();
   if (!session) {
@@ -16,7 +16,7 @@ export async function POST(req: Request) {
   }
 
   const body: unknown = await req.json();
-  const parsed = loginAdminSchema.safeParse(body);
+  const parsed = adminPasscodeSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }
@@ -26,7 +26,6 @@ export async function POST(req: Request) {
   if (!user) {
     return NextResponse.json({ error: "ユーザーが見つかりません。" }, { status: 404 });
   }
-
   const tournament = await prisma.tournament.findUnique({ where: { adminPasscode: parsed.data.passcode } });
   if (!tournament) {
     return NextResponse.json({ error: "管理者パスコードが違います。" }, { status: 401 });

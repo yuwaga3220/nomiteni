@@ -2,7 +2,7 @@
 // ホームページ
 "use client";
 
-import { useLayoutEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AuthModal, LoginCardsSection } from "@/components/AppSections";
 import { useNomiteni } from "@/context/NomiteniContext";
@@ -18,8 +18,6 @@ export function HomePage() {
   const [participantTournaments, setParticipantTournaments] = useState<TournamentBrief[]>([]);
   // コンテキストを取得
   const {
-    me,
-    forceLoginCardsView,
     authModalState,
     setAuthModalState,
     authEmail,
@@ -62,26 +60,24 @@ export function HomePage() {
     refresh,
   } = useNomiteni();
 
-  // ホームページから移動するかどうか
-  const shouldLeaveHome = Boolean(me && me.role !== "PARTICIPANT" && !forceLoginCardsView);
+  // ホームに来たら、セッションを（scope: login、tournamentId なし）に揃える
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      try {
+        await api("/api/auth/session/home", { method: "POST" });
+        if (!cancelled) await refresh();
+      } catch {
+        // 未ログインなどは無視
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- マウント時のみ
+  }, []);
 
-  // マウント時の初期ページ遷移
-  useLayoutEffect(() => {
-    if (!shouldLeaveHome || !me) return;
-    // 移動先を設定
-    const target =
-      me.role === "ADMIN"
-          ? "/admin"
-          : "/observer";
-    // 移動先に移動
-    router.replace(target);
-  }, [shouldLeaveHome, me, router]); // マウント時に一度だけ実行
-
-  // 移動する場合
-  if (shouldLeaveHome) {
-    return <p className="message">ログイン先の画面へ移動しています…</p>;
-  }
-
+  // AuthModalとLoginCardsSectionを返す
   return (
     <>
       <AuthModal
@@ -141,6 +137,11 @@ export function HomePage() {
           if (!selected) return;
           (async () => {
             try {
+              await api("/api/participant/select-tournament", {
+                method: "POST",
+                body: JSON.stringify({ tournamentId }),
+              });
+              await refresh();
               setEntryTournament(selected);
               setEntryPasscode(selected.entryPasscode ?? "");
               setParticipantSelectModalOpen(false);
@@ -173,7 +174,6 @@ export function HomePage() {
               ensureLoginCredentials();
               if (!entryPasscode) throw new Error("大会パスコードを入力してください。");
               if (!entryName) throw new Error("選手名を入力してください。");
-              await api("/api/auth/login/participant", { method: "POST" });
               await api("/api/entry/self", {
                 method: "POST",
                 body: JSON.stringify({
@@ -188,6 +188,7 @@ export function HomePage() {
                 method: "POST",
                 body: JSON.stringify({ tournamentPasscode: entryPasscode }),
               });
+              await refresh();
               setEntryTournament(preview.tournament);
               setEntryModalOpen(false);
               setForceLoginCardsView(false);
@@ -205,7 +206,6 @@ export function HomePage() {
               if (!createTournamentEntryPasscode || !createTournamentObserverPasscode) {
                 throw new Error("大会/観戦パスコードを入力してください。");
               }
-              await api("/api/auth/login/participant", { method: "POST" }); // APIを呼び出し、ログイン
               // APIを呼び出し、大会を作成
               const created = await api<{ tournamentId: number; adminPasscode: string }>("/api/tournaments/create", {
                 method: "POST",
@@ -252,7 +252,6 @@ export function HomePage() {
             try {
               ensureLoginCredentials(); // ログイン資格を確認
               setForceLoginCardsView(true);
-            await api("/api/auth/login/participant", { method: "POST" }); // APIを呼び出し、ログイン
               const result = await api<{ tournaments: TournamentBrief[] }>("/api/participant/tournaments");
               if (!result.tournaments.length) {
                 throw new Error("参加者として紐づく大会がありません。管理者に参加者登録を依頼してください。");
@@ -273,7 +272,7 @@ export function HomePage() {
           }
           call(() => {
             ensureLoginCredentials();
-            return api("/api/auth/login/observer", { // APIを呼び出し、観戦者ログイン
+            return api("/api/auth/observer", {
               method: "POST",
               body: JSON.stringify({ passcode: observerLoginPasscode }),
             });
@@ -287,7 +286,7 @@ export function HomePage() {
           }
           call(() => {
             ensureLoginCredentials();
-            return api("/api/auth/login/admin", { // APIを呼び出し、管理者ログイン
+            return api("/api/auth/admin", {
               method: "POST",
               body: JSON.stringify({ passcode: adminPasscode }),
             });

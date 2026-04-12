@@ -2,12 +2,12 @@ import { NextResponse } from "next/server";
 import { createToken, toClientUser } from "@/lib/auth-server";
 import { getPrisma } from "@/lib/prisma";
 import { entrySchema } from "@/lib/schemas";
-import { requireParticipant } from "@/lib/session-guards";
-import { broadcastState, getActiveTournament } from "@/lib/tournament-service";
+import { requireAnySession } from "@/lib/session-guards";
+import { broadcastState, findActiveTournamentByEntryPasscode } from "@/lib/tournament-service";
 
 // 大会エントリー
 export async function POST(req: Request) {
-  const guard = await requireParticipant(); // 参加者ガードを取得
+  const guard = await requireAnySession();
   if ("error" in guard) return guard.error;
 
   const body: unknown = await req.json();
@@ -16,11 +16,8 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }
 
-  const activeTournament = await getActiveTournament();
-  if (!activeTournament || !activeTournament.entryPasscode) { // 大会エントリーパスコードが未設定の場合
-    return NextResponse.json({ error: "大会エントリーパスコードが未設定です。" }, { status: 401 });
-  }
-  if (parsed.data.tournamentPasscode !== activeTournament.entryPasscode) { // 大会エントリーパスコードが違う場合
+  const tournament = await findActiveTournamentByEntryPasscode(parsed.data.tournamentPasscode);
+  if (!tournament) {
     return NextResponse.json({ error: "大会エントリーパスコードが違います。" }, { status: 401 });
   }
 
@@ -33,16 +30,16 @@ export async function POST(req: Request) {
       note: parsed.data.note,
     },
   });
-  await prisma.userTournamentRole.upsert({ // ユーザーの大会役割を更新
+  await prisma.userTournamentRole.upsert({
     where: {
       tournamentId_userId_role: {
-        tournamentId: activeTournament.id,
+        tournamentId: tournament.id,
         userId: guard.session.userId,
         role: "PARTICIPANT",
       },
     },
     create: {
-      tournamentId: activeTournament.id,
+      tournamentId: tournament.id,
       userId: guard.session.userId,
       role: "PARTICIPANT",
     },
@@ -53,10 +50,14 @@ export async function POST(req: Request) {
   const res = NextResponse.json({
     user: toClientUser({ ...user, scope: "participant" }),
   });
-  res.cookies.set("nomiteni_token", createToken({ userId: user.id, scope: "participant" }), {
-    httpOnly: true,
-    sameSite: "lax",
-    path: "/",
-  });
+  res.cookies.set(
+    "nomiteni_token",
+    createToken({ userId: user.id, scope: "participant", tournamentId: tournament.id }),
+    {
+      httpOnly: true,
+      sameSite: "lax",
+      path: "/",
+    },
+  );
   return res;
 }

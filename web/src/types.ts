@@ -1,7 +1,7 @@
 /**
  * 型定義
  */
-export type Role = "PARTICIPANT" | "ADMIN" | "OBSERVER";
+export type Role = "LOGIN" |"PARTICIPANT" | "ADMIN" | "OBSERVER";
 
 export type User = {
   id: number;

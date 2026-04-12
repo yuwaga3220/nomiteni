@@ -29,7 +29,15 @@ export function UserMenuSection(props: UserMenuProps) {
   const [entryModalOpen, setEntryModalOpen] = useState(false);
   return (
     <section className="card">
-      <h2>{props.me.role === "ADMIN" ? "管理者メニュー" : props.me.role === "PARTICIPANT" ? "参加者メニュー" : "観戦者メニュー"}</h2>
+      <h2>
+        {props.me.role === "ADMIN"
+          ? "管理者メニュー"
+          : props.me.role === "PARTICIPANT"
+            ? "参加者メニュー"
+            : props.me.role === "LOGIN"
+              ? "ログインメニュー"
+              : "観戦者メニュー"}
+      </h2>
       <p>
         ログイン中: {props.me.name} ({props.me.email})
       </p>

@@ -90,6 +90,30 @@ export async function getActiveTournament() {
   });
 }
 
+// 観戦パスコードからアクティブなトーナメントを取得
+export async function getActiveTournamentByObserverPasscode(passcode: string) {
+  const prisma = getPrisma();
+  return prisma.tournament.findFirst({
+    where: {
+      status: { in: [TournamentStatus.DRAFT, TournamentStatus.RUNNING] },
+      observerPasscode: passcode,
+    },
+    orderBy: { createdAt: "desc" },
+  });
+}
+
+// エントリーパスコードが一致するアクティブなトーナメントを1件取得（複数ある場合は createdAt が新しい方）
+export async function findActiveTournamentByEntryPasscode(passcode: string) {
+  const prisma = getPrisma();
+  return prisma.tournament.findFirst({
+    where: {
+      status: { in: [TournamentStatus.DRAFT, TournamentStatus.RUNNING] },
+      entryPasscode: passcode,
+    },
+    orderBy: { createdAt: "desc" },
+  });
+}
+
 // 公開状態をブロードキャスト
 export async function broadcastState() {
   emitStateUpdate(await buildPublicState());

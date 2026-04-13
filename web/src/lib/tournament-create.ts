@@ -1,5 +1,5 @@
 // web/src/lib/tournament-create.ts
-// トーナメント新規作成（ブラケット生成まで）
+// トーナメント新規作成（ブラケット生成までの処理）
 import { TournamentStatus } from "@prisma/client";
 import type { z } from "zod";
 import { COURT_KEY } from "@/lib/config";
@@ -17,7 +17,7 @@ import {
 
 type TournamentSettingsInput = z.infer<typeof tournamentSettingsSchema>;
 
-// トーナメント新規作成（ブラケット生成まで）
+// トーナメント新規作成（ブラケット生成までの処理）
 export async function createTournamentWithSettings(data: TournamentSettingsInput) {
   // プリズマを取得
   const prisma = getPrisma();

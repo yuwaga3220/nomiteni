@@ -4,11 +4,12 @@
 
 ## 技術構成
 
-- 言語: TypeScript
-- アプリ: Next.js（App Router）＋カスタム Node サーバー（`server.ts`）で **HTTP・API・Socket.IO を同一ポート**で提供
+- Language: TypeScript
+- Application: Next.js（App Router）＋カスタム Node サーバー（`server.ts`）で **HTTP・API・Socket.IO を同一ポート**で提供
 - API: `src/app/api/**/route.ts`（Route Handlers）
-- リアルタイム: Socket.IO（`socket.io` / `socket.io-client`）
 - DB: Prisma / SQLite（`better-sqlite3` アダプタ、`web/prisma`）
+- Liverary: Socket.IO（`socket.io` / `socket.io-client`）
+
 
 ## ディレクトリ構成（概要）
 
@@ -59,8 +60,9 @@ npm run dev --prefix web
 認証・認可処理
 
 ## 工夫・こだわり
-テニスサークルの大会や宴会への参加率を上げるためのポイント機能などのエンタメ性も高い機能も搭載すること。
-テニスサークル自体の盛り上げに貢献できるアプリを目指している。
+- テニスサークルの大会や宴会への参加率を上げるためのポイント機能などのエンタメ性も高い機能も搭載すること。
+- テニスサークル自体の盛り上げに貢献できるアプリを目指している。
+- Socket.IOを使用したリアルタイム更新を実装し、試合状態を自動更新し、臨場感を高めている。
 
 
 ## 実装済み機能メモ

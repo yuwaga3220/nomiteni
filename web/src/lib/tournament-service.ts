@@ -1,11 +1,11 @@
 // web/src/lib/tournament-service.ts
-// トーナメント状態・試合進行（旧 TournamentService）
+// トーナメント状態・試合進行の処理
 import { MatchStatus, TournamentStatus } from "@prisma/client";
 import { COURT_KEY } from "@/lib/config";
 import { getPrisma } from "@/lib/prisma";
 import { emitStateUpdate } from "@/lib/socket-registry";
 
-// 2の累乗を取得
+// 2の累乗を計算
 export function nextPowerOfTwo(n: number): number {
   let v = 1;
   while (v < n) v *= 2;

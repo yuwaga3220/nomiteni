@@ -1,5 +1,5 @@
 // web/src/lib/http-error.ts
-// HTTP エラー
+// HTTP Error Class定義
 
 export class HttpError extends Error {
   // コンストラクタ

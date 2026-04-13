@@ -10,7 +10,7 @@ export function createToken(payload: SessionPayload): string {
   return jwt.sign(payload, JWT_SECRET, { expiresIn: "14d" });
 }
 
-// セッショントークンを検証
+// セッショントークンの正当性を検証し、有効なセッションペイロードを返す
 export function verifySessionToken(token: string): SessionPayload | null {
   try {
     return jwt.verify(token, JWT_SECRET) as SessionPayload;

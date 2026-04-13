@@ -1,15 +1,15 @@
 // web/src/lib/socket-registry.ts
-// Socket.IO サーバーを登録
+// Socket.IO サーバーを設定
 import type { Server as SocketIOServer } from "socket.io";
 
 let io: SocketIOServer | undefined;
 
-// Socket.IO サーバーを登録
+// Socket.IO サーバーを設定
 export function setIo(server: SocketIOServer) {
   io = server;
 }
 
-// 状態更新を emit
+// 状態更新を送信
 export function emitStateUpdate(data: unknown) {
   io?.emit("state:update", data);
 }

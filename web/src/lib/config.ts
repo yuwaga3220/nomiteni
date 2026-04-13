@@ -21,8 +21,8 @@ export const isProduction = process.env.NODE_ENV === "production";
 // Socket.IO の CORS 許可元
 
 export function socketCorsOrigins(): true | string[] {
-  // 本番環境でない場合は全て許可
-  if (!isProduction) return true;
+  
+  if (!isProduction) return true; // 本番環境でない場合は全て許可
   // 本番環境では環境変数から許可元を取得
   const fromEnv =
     process.env.CLIENT_ORIGIN?.split(",")

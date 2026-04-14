@@ -5,9 +5,8 @@
 
 import { useLayoutEffect } from "react";
 import { useRouter } from "next/navigation";
-import { RealtimeSection, UserMenuSection } from "@/components/AppSections";
+import { RealtimeSection } from "@/components/AppSections";
 import { useNomiteni } from "@/context/NomiteniContext";
-import { api } from "@/lib/client/api";
 
 // 観戦者ページ
 export function ObserverPage() {
@@ -17,20 +16,11 @@ export function ObserverPage() {
   const {
     me,
     forceLoginCardsView,
-    entryTournament,
-    entryName,
-    setEntryName,
-    entryParty,
-    setEntryParty,
-    entryNote,
-    setEntryNote,
-    entryPasscode,
     state,
     active,
     groupedRounds,
     playerName,
     matchStatusLabel,
-    call,
   } = useNomiteni();
 
   const allowed = Boolean(me && !forceLoginCardsView && me.role === "OBSERVER");
@@ -45,32 +35,14 @@ export function ObserverPage() {
   // 観戦者ページを返す
   return (
     <>
-      <UserMenuSection
-        me={me}
-        entryTournament={entryTournament}
-        entryName={entryName}
-        setEntryName={setEntryName}
-        entryParty={entryParty}
-        setEntryParty={setEntryParty}
-        entryNote={entryNote}
-        setEntryNote={setEntryNote}
-        onEntrySubmit={() =>
-          call(() =>
-            api("/api/entry/self", {
-              method: "POST",
-              body: JSON.stringify({
-                tournamentPasscode: entryPasscode,
-                name: entryName,
-                partyJoin: entryParty,
-                note: entryNote || undefined,
-              }),
-            }),
-          )
-        }
-        onCheckinJoin={() => call(() => api("/api/checkin/self", { method: "POST", body: JSON.stringify({ canPlayToday: true }) }))}
-        onCheckinAbsent={() => call(() => api("/api/checkin/self", { method: "POST", body: JSON.stringify({ canPlayToday: false }) }))}
-        onLogout={() => call(() => api("/api/auth/logout", { method: "POST" }))}
-      />
+      <section className="card">
+        <h2>観戦者メニュー</h2>
+        <p>
+          ログイン中: {me.name} ({me.email})
+        </p>
+        <br />
+        <button onClick={() => router.push("/")}>戻る</button>
+      </section>
       <RealtimeSection
         active={active}
         state={state}

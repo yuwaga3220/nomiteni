@@ -10,7 +10,7 @@ import { useNomiteni } from "@/context/NomiteniContext";
 // アプリケーションシェル（共通レイアウト）
 export function AppShell({ children }: { children: ReactNode }) {
   // ユーザー情報と状態を取得
-  const { me, isHeaderLoggedIn, authEmail, onHeaderLogout, setAuthModalState, message } = useNomiteni();
+  const { me, isLoggedIn, authEmail, onHeaderLogout, setAuthModalState, message } = useNomiteni();
 
   return (
     <main className="container">
@@ -18,7 +18,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <h1>テニサー大会運営サービス Nomiteni</h1>
         <HeaderAuthButtons
           setAuthModalState={setAuthModalState} // 認証モードを設定
-          isHeaderLoggedIn={isHeaderLoggedIn} // ログイン準備ができているか
+          isLoggedIn={isLoggedIn} // ログイン状態
           loginEmail={me?.email ?? authEmail} // ログインメールアドレス
           onLogoutClick={onHeaderLogout} // ログアウトクリック
         />

@@ -52,8 +52,6 @@ export function NomiteniProvider({ children }: { children: ReactNode }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   // ログイン準備ができているかを管理
   const isLoginReady = Boolean(authEmail && authPassword);
-  // ログイン中かどうかを管理
-  const isHeaderLoggedIn = isLoggedIn;
 
   // ユーザーIDからユーザー情報を取得
   const usersById = useMemo(
@@ -296,8 +294,8 @@ export function NomiteniProvider({ children }: { children: ReactNode }) {
     setTournamentTimeSlot,
     courtCountInput,
     setCourtCountInput,
+    isLoggedIn,
     isLoginReady,
-    isHeaderLoggedIn,
     active,
     assignableMatches,
     refresh,

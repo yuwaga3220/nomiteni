@@ -19,13 +19,11 @@ function messageFromZodishError(error: unknown): string | null {
   if (!error || typeof error !== "object") return null;
   const f = error as { formErrors?: unknown; fieldErrors?: unknown };
   const parts: string[] = [];
-  // フォームエラーがある場合
   if (Array.isArray(f.formErrors)) {
     for (const x of f.formErrors) {
       if (typeof x === "string" && x) parts.push(x); // フォームエラーを追加
     }
   }
-  // フィールドエラーがある場合
   if (f.fieldErrors && typeof f.fieldErrors === "object" && f.fieldErrors !== null) {
     for (const [k, v] of Object.entries(f.fieldErrors)) {
       if (Array.isArray(v)) {
@@ -51,24 +49,19 @@ async function readApiFailureMessage(res: Response): Promise<string> {
   try {
     data = JSON.parse(text) as unknown;
   } catch {
-    // パースエラーの場合
     return `${text.replace(/\s+/g, " ").slice(0, 280).trim()}${statusHint}`;
   }
-  // データが空の場合
   if (!data || typeof data !== "object" || Array.isArray(data)) {
     return `APIの応答を解釈できませんでした。${statusHint}`;
   }
   // データをオブジェクトに変換
   const o = data as Record<string, unknown>;
-  // エラーがある場合（文字列）
   if (typeof o.error === "string" && o.error) {
     return `${o.error}（${res.status}）`;
   }
-  // エラーがある場合（オブジェクト）
   if (o.error !== undefined && o.error !== null) {
     const z = messageFromZodishError(o.error);
     if (z) return `${z}（${res.status}）`;
-    // JSON に変換
     try {
       return `${JSON.stringify(o.error)}（${res.status}）`;
     } catch {
@@ -78,8 +71,6 @@ async function readApiFailureMessage(res: Response): Promise<string> {
   if (typeof o.message === "string" && o.message) {
     return `${o.message}（${res.status}）`;
   }
-
-  // データをJSONに変換
   try {
     const raw = JSON.stringify(data);
     if (raw && raw !== "{}") {
@@ -115,7 +106,6 @@ export function getSocket(): Socket {
 export async function api<T>(path: string, init?: RequestInit): Promise<T> {
   const base = getApiBase();
   let res: Response;
-  // リクエストを送信
   try {
     res = await fetch(`${base}${path}`, {
       ...init,

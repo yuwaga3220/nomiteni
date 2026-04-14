@@ -59,8 +59,8 @@ export type NomiteniContextValue = {
   setTournamentTimeSlot: Dispatch<SetStateAction<string>>;
   courtCountInput: number;
   setCourtCountInput: Dispatch<SetStateAction<number>>;
+  isLoggedIn: boolean;
   isLoginReady: boolean;
-  isHeaderLoggedIn: boolean;
   active: PublicState["activeTournament"];
   assignableMatches: Match[];
   refresh: () => Promise<void>;

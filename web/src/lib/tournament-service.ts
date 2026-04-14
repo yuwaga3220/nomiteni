@@ -34,12 +34,11 @@ export async function getCourtCount(): Promise<number> {
 // 開催状況と参加者情報を含む状態を取得(大会の開催状況の公開用)
 export async function buildPublicState() {
   const prisma = getPrisma();
-  // prismaから現在開催中の大会を取得
   const activeTournament = await prisma.tournament.findFirst({ 
     where: {
       status: { in: [TournamentStatus.DRAFT, TournamentStatus.RUNNING] },
-    }, // 草稿または開催中の大会を取得
-    orderBy: { createdAt: "desc" }, // 作成日時で降順にソート
+    },
+    orderBy: { createdAt: "desc" },
     select: {
       id: true,
       name: true,
@@ -48,7 +47,7 @@ export async function buildPublicState() {
       courtCount: true,
       status: true,
       matches: {
-        orderBy: [{ round: "asc" }, { position: "asc" }], // ラウンドと位置で昇順にソート
+        orderBy: [{ round: "asc" }, { position: "asc" }],
         select: {
           id: true,
           tournamentId: true,
@@ -64,9 +63,8 @@ export async function buildPublicState() {
     },
   });
 
-  // prismaから参加者を取得
   const users = await prisma.user.findMany({
-    orderBy: [{ checkedIn: "desc" }, { name: "asc" }], // チェックイン日時で降順にソート、名前で昇順にソート
+    orderBy: [{ checkedIn: "desc" }, { name: "asc" }],
     select: {
       id: true,
       name: true,
@@ -77,11 +75,11 @@ export async function buildPublicState() {
     },
   });
 
-  const courtCount = await getCourtCount(); // コート数を取得
-  return { users, activeTournament, courtCount }; // 状態を返す
+  const courtCount = await getCourtCount();
+  return { users, activeTournament, courtCount };
 }
 
-// アクティブなトーナメントを取得
+// 草稿または開催中のトーナメントをひとつだけ取得
 export async function getActiveTournament() {
   const prisma = getPrisma();
   return prisma.tournament.findFirst({
@@ -90,7 +88,7 @@ export async function getActiveTournament() {
   });
 }
 
-// 観戦パスコードからアクティブなトーナメントを取得
+// 観戦パスコードが一致するアクティブなトーナメントをひとつだけ取得
 export async function getActiveTournamentByObserverPasscode(passcode: string) {
   const prisma = getPrisma();
   return prisma.tournament.findFirst({
@@ -102,7 +100,7 @@ export async function getActiveTournamentByObserverPasscode(passcode: string) {
   });
 }
 
-// エントリーパスコードが一致するアクティブなトーナメントを1件取得（複数ある場合は createdAt が新しい方）
+// エントリーパスコードが一致するアクティブなトーナメントをひとつだけ取得（複数ある場合は createdAt が新しい方）
 export async function findActiveTournamentByEntryPasscode(passcode: string) {
   const prisma = getPrisma();
   return prisma.tournament.findFirst({
@@ -119,7 +117,7 @@ export async function broadcastState() {
   emitStateUpdate(await buildPublicState());
 }
 
-// 勝者を次の試合に追加
+// 勝者を次の試合に設定
 export async function attachWinnerToNext(matchId: number) {
   const prisma = getPrisma();
   const match = await prisma.match.findUnique({ where: { id: matchId } });

@@ -54,6 +54,15 @@ export function ParticipantPage() {
   if (!allowed) return null;
 
   return (
+    <>
+    <section className="card">
+      <h2>参加者メニュー</h2>
+      <p>
+        ログイン中: {me?.name} ({me?.email})
+      </p>
+      <br />
+      <button onClick={() => router.push("/")}>戻る</button>
+    </section>
     <RealtimeSection
       active={state?.activeTournament}
       state={state}
@@ -61,5 +70,6 @@ export function ParticipantPage() {
       playerName={playerName}
       matchStatusLabel={matchStatusLabel}
     />
+    </>
   );
 }

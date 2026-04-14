@@ -4,9 +4,9 @@
 
 import { useLayoutEffect } from "react";
 import { useRouter } from "next/navigation";
-import { AdminManagementSection, AdminMatchesSection, RealtimeSection, UserMenuSection } from "@/components/sections/AppSections";
+import { AdminManagementSection, AdminMatchesSection, RealtimeSection } from "@/components/AppSections";
 import { useNomiteni } from "@/context/NomiteniContext";
-import { api } from "@/lib/client/api";
+import { useAdminActions } from "./hooks/useAdminActions";
 
 // 管理者ページ
 export function AdminPage() {
@@ -16,14 +16,6 @@ export function AdminPage() {
   const {
     me,
     forceLoginCardsView,
-    entryTournament,
-    entryName,
-    setEntryName,
-    entryParty,
-    setEntryParty,
-    entryNote,
-    setEntryNote,
-    entryPasscode,
     state,
     active,
     tournamentName,
@@ -45,6 +37,15 @@ export function AdminPage() {
     matchStatusLabel,
     call,
   } = useNomiteni();
+  const actions = useAdminActions({
+    call,
+    tournamentName,
+    tournamentDate,
+    tournamentTimeSlot,
+    courtCountInput,
+    entrySetPasscode,
+    observerSetPasscode,
+  });
 
   const allowed = Boolean(me && !forceLoginCardsView && me.role === "ADMIN");
   // 管理者ログインチェック
@@ -57,32 +58,14 @@ export function AdminPage() {
   // 管理者ページを返す
   return (
     <>
-      <UserMenuSection
-        me={me}
-        entryTournament={entryTournament}
-        entryName={entryName}
-        setEntryName={setEntryName}
-        entryParty={entryParty}
-        setEntryParty={setEntryParty}
-        entryNote={entryNote}
-        setEntryNote={setEntryNote}
-        onEntrySubmit={() =>
-          call(() =>
-            api("/api/entry/self", {
-              method: "POST",
-              body: JSON.stringify({
-                tournamentPasscode: entryPasscode,
-                name: entryName,
-                partyJoin: entryParty,
-                note: entryNote || undefined,
-              }),
-            }),
-          )
-        }
-        onCheckinJoin={() => call(() => api("/api/checkin/self", { method: "POST", body: JSON.stringify({ canPlayToday: true }) }))}
-        onCheckinAbsent={() => call(() => api("/api/checkin/self", { method: "POST", body: JSON.stringify({ canPlayToday: false }) }))}
-        onLogout={() => call(() => api("/api/auth/logout", { method: "POST" }))}
-      />
+      <section className="card">
+        <h2>管理者メニュー</h2>
+        <p>
+          ログイン中: {me.name} ({me.email})
+        </p>
+        <br />
+        <button onClick={() => router.push("/")}>戻る</button>
+      </section>
       <AdminManagementSection
         active={active}
         state={state}
@@ -99,68 +82,19 @@ export function AdminPage() {
         entrySetPasscode={entrySetPasscode}
         setEntrySetPasscode={setEntrySetPasscode}
         checkinState={checkinState}
-        onSaveTournamentSettings={() =>
-          call(() =>
-            api("/api/admin/tournaments/settings", {
-              method: "POST",
-              body: JSON.stringify({
-                name: tournamentName,
-                eventDate: tournamentDate || null,
-                timeSlot: tournamentTimeSlot || null,
-                courtCount: courtCountInput,
-                entryPasscode: entrySetPasscode,
-                observerPasscode: observerSetPasscode,
-              }),
-            }),
-          )
-        }
-        onSetReady={(id: number) =>
-          call(() =>
-            api(`/api/admin/participants/${id}/checkin`, {
-              method: "POST",
-              body: JSON.stringify({ checkedIn: true, canPlayToday: true }),
-            }),
-          )
-        }
-        onSetAbsent={(id: number) =>
-          call(() =>
-            api(`/api/admin/participants/${id}/checkin`, {
-              method: "POST",
-              body: JSON.stringify({ checkedIn: true, canPlayToday: false }),
-            }),
-          )
-        }
-        onSetUnanswered={(id: number) =>
-          call(() =>
-            api(`/api/admin/participants/${id}/checkin`, {
-              method: "POST",
-              body: JSON.stringify({ checkedIn: false, canPlayToday: null }),
-            }),
-          )
-        }
+        onSaveTournamentSettings={actions.onSaveTournamentSettings}
+        onSetReady={actions.onSetReady}
+        onSetAbsent={actions.onSetAbsent}
+        onSetUnanswered={actions.onSetUnanswered}
       />
       {active && (
         <AdminMatchesSection
           state={state}
           matches={assignableMatches}
           playerName={playerName}
-          onAssignCourt={(matchId, courtNumber) =>
-            call(() =>
-              api(`/api/admin/matches/${matchId}/assign`, {
-                method: "POST",
-                body: JSON.stringify({ courtNumber }),
-              }),
-            )
-          }
-          onStart={(matchId) => call(() => api(`/api/admin/matches/${matchId}/start`, { method: "POST" }))}
-          onWin={(matchId, winnerId) =>
-            call(() =>
-              api(`/api/admin/matches/${matchId}/result`, {
-                method: "POST",
-                body: JSON.stringify({ winnerId }),
-              }),
-            )
-          }
+          onAssignCourt={actions.onAssignCourt}
+          onStart={actions.onStart}
+          onWin={actions.onWin}
         />
       )}
       <RealtimeSection

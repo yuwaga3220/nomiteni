@@ -19,9 +19,8 @@ type TournamentSettingsInput = z.infer<typeof tournamentSettingsSchema>;
 
 // トーナメント新規作成（ブラケット生成までの処理）
 export async function createTournamentWithSettings(data: TournamentSettingsInput) {
-  // プリズマを取得
   const prisma = getPrisma();
-  // 進行中のトーナメントを取得
+  // ここ修正予定
   const runningTournament = await prisma.tournament.findFirst({
     where: { status: TournamentStatus.RUNNING },
     orderBy: { createdAt: "desc" },
@@ -29,19 +28,12 @@ export async function createTournamentWithSettings(data: TournamentSettingsInput
   if (runningTournament) {
     throw new HttpError(400, "進行中の大会があるため、新規トーナメントは作成できません。");
   }
-
-  // 参加者を取得
-  const players = await prisma.user.findMany({
-    where: { checkedIn: true, canPlayToday: true },
-    select: { id: true },
-  });
-
+  
   // 進行中のトーナメントを更新
   await prisma.tournament.updateMany({
     where: { status: TournamentStatus.DRAFT },
     data: { status: TournamentStatus.FINISHED },
   });
-
   // トーナメントを作成
   const tournament = await prisma.tournament.create({
     data: {
@@ -56,16 +48,17 @@ export async function createTournamentWithSettings(data: TournamentSettingsInput
     },
   });
 
-  // コート数を更新
-  await prisma.appSetting.upsert({
+  await prisma.appSetting.upsert({ // コート数を更新
     where: { key: COURT_KEY },
     update: { value: String(data.courtCount) },
     create: { key: COURT_KEY, value: String(data.courtCount) },
   });
 
-  // 参加者が2名未満の場合
-  if (players.length < 2) {
-    // ブロードキャスト
+  const players = await prisma.user.findMany({
+    where: { checkedIn: true, canPlayToday: true },
+    select: { id: true },
+  });
+  if (players.length < 2) { // 参加者が2名未満の場合
     await broadcastState();
     return {
       tournamentId: tournament.id,

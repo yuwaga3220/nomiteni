@@ -2,16 +2,13 @@
 // トーナメント新規作成（ブラケット生成までの処理）
 import { TournamentStatus } from "@prisma/client";
 import type { z } from "zod";
-import { COURT_KEY } from "@/lib/config";
 import { issueUniqueAdminPasscode } from "@/lib/admin-passcode";
 import { getPrisma } from "@/lib/prisma";
 import { tournamentSettingsSchema } from "@/lib/schemas";
-import { HttpError } from "@/lib/http-error";
 import {
   broadcastState,
   nextPowerOfTwo,
   resolveAutomaticMatches,
-  shuffle,
   updateTournamentStatus,
 } from "@/lib/tournament-service";
 
@@ -20,20 +17,7 @@ type TournamentSettingsInput = z.infer<typeof tournamentSettingsSchema>;
 // トーナメント新規作成（ブラケット生成までの処理）
 export async function createTournamentWithSettings(data: TournamentSettingsInput) {
   const prisma = getPrisma();
-  // ここ修正予定
-  const runningTournament = await prisma.tournament.findFirst({
-    where: { status: TournamentStatus.RUNNING },
-    orderBy: { createdAt: "desc" },
-  });
-  if (runningTournament) {
-    throw new HttpError(400, "進行中の大会があるため、新規トーナメントは作成できません。");
-  }
   
-  // 進行中のトーナメントを更新
-  await prisma.tournament.updateMany({
-    where: { status: TournamentStatus.DRAFT },
-    data: { status: TournamentStatus.FINISHED },
-  });
   // トーナメントを作成
   const tournament = await prisma.tournament.create({
     data: {
@@ -48,15 +32,9 @@ export async function createTournamentWithSettings(data: TournamentSettingsInput
     },
   });
 
-  await prisma.appSetting.upsert({ // コート数を更新
-    where: { key: COURT_KEY },
-    update: { value: String(data.courtCount) },
-    create: { key: COURT_KEY, value: String(data.courtCount) },
-  });
-
-  const players = await prisma.user.findMany({
-    where: { checkedIn: true, canPlayToday: true },
-    select: { id: true },
+  const players = await prisma.userTournamentRole.findMany({
+    where: { tournamentId: tournament.id, role: "PARTICIPANT" },
+    select: { userId: true, initialPosition: true },
   });
   if (players.length < 2) { // 参加者が2名未満の場合
     await broadcastState();
@@ -66,15 +44,19 @@ export async function createTournamentWithSettings(data: TournamentSettingsInput
       warning: "参加可能者が2名未満のため、対戦表はまだ作成されていません。",
     };
   }
-
-  // 参加者をシャッフル
-  const shuffled = shuffle(players.map((p) => p.id));
-  // 参加者数の次の2の累乗を取得
-  const size = nextPowerOfTwo(shuffled.length);
-  // ラウンド数を取得
-  const rounds = Math.log2(size);
-  // スロットを作成
-  const slots: Array<number | null> = [...shuffled];
+  
+  // 大会内の初期ポジション順で参加者を確定し、未設定者は後ろに寄せる（昇順）
+  const playerIds = [...players]
+    .sort((a, b) => {
+      const aPos = a.initialPosition ?? Number.MAX_SAFE_INTEGER;
+      const bPos = b.initialPosition ?? Number.MAX_SAFE_INTEGER;
+      if (aPos !== bPos) return aPos - bPos;
+      return a.userId - b.userId;
+    })
+    .map((p) => p.userId); // 参加者IDを取得（大会内の初期ポジション順）
+  const size = nextPowerOfTwo(playerIds.length); // 参加者数の次の2の累乗を取得
+  const rounds = Math.log2(size); // ラウンド数を取得
+  const slots: Array<number | null> = [...playerIds]; // スロットを作成
   while (slots.length < size) slots.push(null);
 
   // 試合を作成

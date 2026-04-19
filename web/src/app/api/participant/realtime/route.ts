@@ -79,7 +79,6 @@ export async function GET(req: Request) {
 
   return NextResponse.json({ // レスポンスを返す
     users,
-    activeTournament: tournament,
-    courtCount: tournament.courtCount,
+    activeTournaments: tournament ? [tournament] : [],
   });
 }

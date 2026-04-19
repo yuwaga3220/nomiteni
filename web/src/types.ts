@@ -48,10 +48,15 @@ export type TournamentBrief = {
   status: string;
 };
 
+export type TournamentParticipant = {
+  userId: number;
+  name: string;
+  initialPosition: number | null;
+};
+
 export type PublicState = {
   users: User[];
-  activeTournament: Tournament | null;
-  courtCount: number;
+  activeTournaments: Tournament[];
 };
 
 export type CheckinState = "UNANSWERED" | "READY" | "ABSENT";

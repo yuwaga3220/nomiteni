@@ -3,7 +3,7 @@
 "use client";
 
 import { createContext, useContext, type Dispatch, type SetStateAction } from "react";
-import type { AuthMode, CheckinState, Match, Me, PublicState, TournamentBrief, User } from "@/types";
+import type { AuthMode, CheckinState, Match, Me, PublicState, TournamentBrief, TournamentParticipant, User } from "@/types";
 
 export type NomiteniContextValue = {
   me: Me | null;
@@ -61,7 +61,8 @@ export type NomiteniContextValue = {
   setCourtCountInput: Dispatch<SetStateAction<number>>;
   isLoggedIn: boolean;
   isLoginReady: boolean;
-  active: PublicState["activeTournament"];
+  activeTournaments: PublicState["activeTournaments"];
+  active: PublicState["activeTournaments"][number] | null;
   assignableMatches: Match[];
   refresh: () => Promise<void>;
   playerName: (id: number | null) => string;
@@ -70,6 +71,7 @@ export type NomiteniContextValue = {
   call: (fn: () => Promise<unknown>) => Promise<void>;
   ensureLoginCredentials: () => void;
   groupedRounds: Array<[number, Match[]]>;
+  tournamentParticipants: TournamentParticipant[];
   onHeaderLogout: () => void;
 };
 

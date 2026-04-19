@@ -16,6 +16,7 @@ export function ParticipantPage() {
   const [state, setState] = useState<PublicState | null>(null);
 
   const { me, forceLoginCardsView, setMessage, matchStatusLabel } = useNomiteni();
+  const activeTournament = state?.activeTournaments[0] ?? null;
 
   const tournamentId = Number(searchParams.get("tournamentId"));
   const allowed = Boolean(!forceLoginCardsView && me?.role === "PARTICIPANT");
@@ -43,13 +44,14 @@ export function ParticipantPage() {
     if (!id) return "BYE";
     return usersById.get(id)?.name ?? `Player #${id}`;
   };
+  
   const groupedRounds = useMemo(() => { // 試合をグループ化
     const map = new Map<number, Match[]>();
-    for (const m of state?.activeTournament?.matches ?? []) {
+    for (const m of activeTournament?.matches ?? []) {
       map.set(m.round, [...(map.get(m.round) ?? []), m]);
     }
     return [...map.entries()].sort((a, b) => a[0] - b[0]);
-  }, [state?.activeTournament?.matches]);
+  }, [activeTournament?.matches]);
 
   if (!allowed) return null;
 
@@ -64,7 +66,7 @@ export function ParticipantPage() {
       <button onClick={() => router.push("/")}>戻る</button>
     </section>
     <RealtimeSection
-      active={state?.activeTournament}
+      active={activeTournament}
       state={state}
       groupedRounds={groupedRounds}
       playerName={playerName}

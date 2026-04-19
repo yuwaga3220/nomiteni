@@ -18,6 +18,7 @@ export async function POST(req: Request) {
     }
 
     const result = await createTournamentWithSettings(parsed.data); // 大会を作成
+
     return NextResponse.json(result);
   } catch (e) {
     if (e instanceof HttpError) { // HttpErrorの場合

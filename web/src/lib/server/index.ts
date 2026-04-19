@@ -4,7 +4,7 @@
 export { requireScopedAdminTournament } from "@/lib/admin-scope";
 export { issueUniqueAdminPasscode } from "@/lib/admin-passcode";
 export { createToken, toClientUser, verifySessionToken } from "@/lib/auth-server";
-export { COURT_KEY, JWT_SECRET, SOCKET_ALLOWED_ORIGINS, isProduction, socketCorsOrigins } from "@/lib/config";
+export { JWT_SECRET, SOCKET_ALLOWED_ORIGINS, isProduction, socketCorsOrigins } from "@/lib/config";
 export { HttpError } from "@/lib/http-error";
 export { getPrisma } from "@/lib/prisma";
 export { jsonFromError } from "@/lib/route-utils";
@@ -28,8 +28,6 @@ export {
   broadcastState,
   buildPublicState,
   findActiveTournamentByEntryPasscode,
-  getActiveTournament,
-  getCourtCount,
   nextPowerOfTwo,
   resolveAutomaticMatches,
   shuffle,

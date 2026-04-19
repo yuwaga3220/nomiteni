@@ -8,7 +8,7 @@
 import { useEffect, useLayoutEffect, useMemo, useState, type ReactNode } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { api, getSocket } from "@/lib/client/api";
-import type { AuthMode, CheckinState, Match, Me, PublicState, TournamentBrief, User } from "@/types";
+import type { AuthMode, CheckinState, Match, Me, PublicState, TournamentBrief, TournamentParticipant, User } from "@/types";
 import { NomiteniContext, type NomiteniContextValue } from "@/context/NomiteniContext";
 
 // プロバイダーコンポーネント
@@ -44,13 +44,13 @@ export function NomiteniProvider({ children }: { children: ReactNode }) {
   const [createTournamentObserverPasscode, setCreateTournamentObserverPasscode] = useState("");
   const [observerSetPasscode, setObserverSetPasscode] = useState("");
   const [entrySetPasscode, setEntrySetPasscode] = useState("");
+  const [tournamentParticipants, setTournamentParticipants] = useState<TournamentParticipant[]>([]);
   const [tournamentName, setTournamentName] = useState("春シングルス大会");
   const [tournamentDate, setTournamentDate] = useState("");
   const [tournamentTimeSlot, setTournamentTimeSlot] = useState("");
   const [courtCountInput, setCourtCountInput] = useState(2);
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  // ログイン準備ができているかを管理
   const isLoginReady = Boolean(authEmail && authPassword);
 
   // ユーザーIDからユーザー情報を取得
@@ -58,8 +58,8 @@ export function NomiteniProvider({ children }: { children: ReactNode }) {
     () => new Map((state?.users ?? []).map((u) => [u.id, u])),
     [state?.users],
   );
-  // 現在開催中の大会を取得
-  const active = state?.activeTournament ?? null;
+  const activeTournaments = state?.activeTournaments ?? [];
+  const active = activeTournaments[0] ?? null;
   // 試合を割り当て可能な試合を取得
   const assignableMatches = (active?.matches ?? []).filter(
     (m) => m.status !== "COMPLETED" && m.player1Id && m.player2Id,
@@ -67,27 +67,24 @@ export function NomiteniProvider({ children }: { children: ReactNode }) {
   // 状態を更新
   const refresh = async () => {
     const [{ user, isLoggedIn }, data] = await Promise.all([
-      api<{ user: Me | null; isLoggedIn: boolean }>("/api/auth/me"), // APIを呼び出し、ユーザー情報を取得
-      api<PublicState>("/api/public/state"), // APIを呼び出し、状態を取得
+      api<{ user: Me | null; isLoggedIn: boolean }>("/api/auth/me"), // ユーザー情報を取得
+      api<PublicState>("/api/public/state"), // 状態を取得
     ]);
     setMe(user);
     setIsLoggedIn(isLoggedIn);
     setState(data);
-    setCourtCountInput(data.courtCount);
     setMessage("");
   };
 
   // マウント時に接続を確立し、アンマウント時に接続を解除
   useEffect(() => {
-    // キャンセルフラグを管理
     let cancelled = false;
-    // 状態を更新
-    void refresh().catch((e: Error) => {
-      if (!cancelled) setMessage(e.message); // キャンセルフラグが立っていなければエラーメッセージを表示
+    void refresh().catch((e: Error) => { // 初期更新
+      if (!cancelled) setMessage(e.message);
     });
-    const socket = getSocket(); // Socket.IOを取得
-    const onState = (next: PublicState) => setState(next); // 状態を更新
-    const onConnectError = () => { // 接続エラーを管理
+    const socket = getSocket();
+    const onState = (next: PublicState) => setState(next);
+    const onConnectError = () => {
       if (cancelled) return;
       setMessage((prev) =>
         prev
@@ -95,10 +92,9 @@ export function NomiteniProvider({ children }: { children: ReactNode }) {
           : "リアルタイム接続に失敗しています。ターミナルに「ポート 3000 は既に使われています」と出ていれば、古い Node（next dev など）を止めてから npm run dev を1つだけ起動してください。next dev だけが動いていると Socket.IO がなく、画面の自動更新も止まります。",
       );
     };
-    socket.on("state:update", onState); // 状態更新イベントを管理
-    socket.on("connect_error", onConnectError); // 接続エラーイベントを管理
-    socket.connect(); // Socket.IOを接続
-    // アンマウント時に実行
+    socket.on("state:update", onState);
+    socket.on("connect_error", onConnectError);
+    socket.connect();
     return () => {
       cancelled = true;
       socket.off("state:update", onState);
@@ -121,8 +117,8 @@ export function NomiteniProvider({ children }: { children: ReactNode }) {
     setTournamentName(active?.name ?? "春シングルス大会");
     setTournamentDate(active?.eventDate ?? "");
     setTournamentTimeSlot(active?.timeSlot ?? "");
-    setCourtCountInput(active?.courtCount ?? state?.courtCount ?? 2);
-  }, [active, state?.courtCount]); // 大会情報が変化したら
+    setCourtCountInput(active?.courtCount ?? 2);
+  }, [active?.name, active?.eventDate, active?.timeSlot, active?.courtCount]); // 大会情報が変化したら
 
   // 管理者の情報を現在の値で更新
   useEffect(() => {
@@ -136,14 +132,16 @@ export function NomiteniProvider({ children }: { children: ReactNode }) {
         entryPasscode: string | null;
         observerPasscode: string | null;
       };
+      participants: TournamentParticipant[];
     }>("/api/admin/tournaments/settings")
-      .then(({ tournament }) => {
+      .then(({ tournament, participants }) => {
         setTournamentName(tournament.name);
         setTournamentDate(tournament.eventDate ?? "");
         setTournamentTimeSlot(tournament.timeSlot ?? "");
         setCourtCountInput(tournament.courtCount);
         setEntrySetPasscode(tournament.entryPasscode ?? "");
         setObserverSetPasscode(tournament.observerPasscode ?? "");
+        setTournamentParticipants(participants);
       })
       .catch(() => undefined);
   }, [me?.role]); // ユーザー情報が変化したら
@@ -172,7 +170,6 @@ export function NomiteniProvider({ children }: { children: ReactNode }) {
       if (pathname !== "/") router.replace("/");
       return;
     }
-    // PARTICIPANT
     if (pathname !== "/" && pathname !== "/participant") router.replace("/");
   }, [me, forceLoginCardsView, pathname, router]);
 
@@ -225,7 +222,6 @@ export function NomiteniProvider({ children }: { children: ReactNode }) {
 
   // ヘッダーのログアウト
   const onHeaderLogout = () => {
-    // 認証モードをリセット
     setAuthModalState("none");
     setAuthEmail("");
     setAuthPassword("");
@@ -296,6 +292,7 @@ export function NomiteniProvider({ children }: { children: ReactNode }) {
     setCourtCountInput,
     isLoggedIn,
     isLoginReady,
+    activeTournaments,
     active,
     assignableMatches,
     refresh,
@@ -305,6 +302,7 @@ export function NomiteniProvider({ children }: { children: ReactNode }) {
     call,
     ensureLoginCredentials,
     groupedRounds,
+    tournamentParticipants,
     onHeaderLogout,
   };
 

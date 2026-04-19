@@ -1,40 +1,30 @@
 // web/src/lib/tournament-service.ts
 // トーナメント状態・試合進行の処理
 import { MatchStatus, TournamentStatus } from "@prisma/client";
-import { COURT_KEY } from "@/lib/config";
 import { getPrisma } from "@/lib/prisma";
 import { emitStateUpdate } from "@/lib/socket-registry";
 
-// 2の累乗を計算
+// トーナメントの足の数を計算
 export function nextPowerOfTwo(n: number): number {
   let v = 1;
   while (v < n) v *= 2;
   return v;
 }
 
-// シャッフル
+// 参加者をランダムで並べる
 export function shuffle<T>(items: T[]): T[] {
   const arr = [...items];
   for (let i = arr.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
+    [arr[i], arr[j]] = [arr[j], arr[i]]; // 要素を交換
   }
   return arr;
 }
 
-// コート数を取得
-export async function getCourtCount(): Promise<number> {
-  const prisma = getPrisma();
-  const activeTournament = await getActiveTournament();
-  if (activeTournament?.courtCount) return activeTournament.courtCount;
-  const setting = await prisma.appSetting.findUnique({ where: { key: COURT_KEY } });
-  return Number(setting?.value ?? "2");
-}
-
-// 開催状況と参加者情報を含む状態を取得(大会の開催状況の公開用)
+// activeな大会とユーザ情報を取得（HomePageでの公開用）
 export async function buildPublicState() {
   const prisma = getPrisma();
-  const activeTournament = await prisma.tournament.findFirst({ 
+  const activeTournaments = await prisma.tournament.findMany({
     where: {
       status: { in: [TournamentStatus.DRAFT, TournamentStatus.RUNNING] },
     },
@@ -62,7 +52,6 @@ export async function buildPublicState() {
       },
     },
   });
-
   const users = await prisma.user.findMany({
     orderBy: [{ checkedIn: "desc" }, { name: "asc" }],
     select: {
@@ -74,18 +63,7 @@ export async function buildPublicState() {
       note: true,
     },
   });
-
-  const courtCount = await getCourtCount();
-  return { users, activeTournament, courtCount };
-}
-
-// 草稿または開催中のトーナメントをひとつだけ取得
-export async function getActiveTournament() {
-  const prisma = getPrisma();
-  return prisma.tournament.findFirst({
-    where: { status: { in: [TournamentStatus.DRAFT, TournamentStatus.RUNNING] } },
-    orderBy: { createdAt: "desc" },
-  });
+  return { users, activeTournaments };
 }
 
 // 観戦パスコードが一致するアクティブなトーナメントをひとつだけ取得

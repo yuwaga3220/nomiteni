@@ -49,7 +49,7 @@ type HomeAccessProps = {
   createTournamentObserverPasscode: string;
   setCreateTournamentObserverPasscode: (v: string) => void;
   onCreateTournament: () => void;
-  activeTournament: Tournament | null | undefined;
+  activeTournaments: Tournament[];
 };
 
 // ホームアクセスセクションを返す
@@ -98,10 +98,16 @@ export function HomeAccessSection(props: HomeAccessProps) {
 
         <div className="card">
           <h2>現在の大会状況</h2>
-          {props.activeTournament ? (
-            <>
-              <p>{props.activeTournament.name}({props.activeTournament.status}) / 開催日: {props.activeTournament.eventDate || "-"}</p>
-            </>
+          {props.activeTournaments.length > 0 ? (
+            <div className="list">
+              {props.activeTournaments.map((tournament) => (
+                <div key={tournament.id} className="listItem">
+                  <span>
+                    {tournament.name}({tournament.status}) / 開催日: {tournament.eventDate || "-"}
+                  </span>
+                </div>
+              ))}
+            </div>
           ) : (
             <p>現在進行中/準備中の大会はありません。</p>
           )}

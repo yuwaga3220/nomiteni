@@ -174,13 +174,20 @@ export function useHomeActions(params: UseHomeActionsParams) {
       params.setAuthModalState("login");
       return;
     }
-    params.call(() => {
-      params.ensureLoginCredentials();
-      return api("/api/auth/admin", {
-        method: "POST",
-        body: JSON.stringify({ passcode: params.adminPasscode }),
-      });
-    });
+    (async () => {
+      try {
+        params.ensureLoginCredentials();
+        await api<{ user: unknown; tournamentId: number }>("/api/auth/admin", {
+          method: "POST",
+          body: JSON.stringify({ passcode: params.adminPasscode }),
+        });
+        await params.refresh();
+        params.setForceLoginCardsView(false);
+        params.router.replace("/admin");
+      } catch (e) {
+        params.setMessage((e as Error).message);
+      }
+    })();
   };
 
   const onCreateTournament = async (setCreateModalOpen: (v: boolean) => void) => {

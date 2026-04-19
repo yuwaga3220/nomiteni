@@ -44,6 +44,7 @@ export async function POST(req: Request) {
 
   const res = NextResponse.json({
     user: toClientUser({ ...user, scope: "admin" }),
+    tournamentId: tournament.id,
   });
   res.cookies.set(
     "nomiteni_token",

@@ -30,7 +30,8 @@ export async function POST(req: Request) {
       note: parsed.data.note,
     },
   });
-  await prisma.userTournamentRole.upsert({
+  // その参加者がその大会にすでに参加しているかを確認
+  const existingParticipantRole = await prisma.userTournamentRole.findUnique({
     where: {
       tournamentId_userId_role: {
         tournamentId: tournament.id,
@@ -38,13 +39,24 @@ export async function POST(req: Request) {
         role: "PARTICIPANT",
       },
     },
-    create: {
-      tournamentId: tournament.id,
-      userId: guard.session.userId,
-      role: "PARTICIPANT",
-    },
-    update: {},
+    select: { id: true },
   });
+  if (!existingParticipantRole) {
+    // その参加者がその大会にすでに参加していない場合、参加者の位置を取得
+    const maxInitialPosition = await prisma.userTournamentRole.aggregate({
+      where: { tournamentId: tournament.id, role: "PARTICIPANT" },
+      _max: { initialPosition: true },
+    });
+    // その参加者を参加者として追加
+    await prisma.userTournamentRole.create({
+      data: {
+        tournamentId: tournament.id,
+        userId: guard.session.userId,
+        role: "PARTICIPANT",
+        initialPosition: (maxInitialPosition._max.initialPosition ?? 0) + 1,
+      },
+    });
+  }
   
   await broadcastState(); // 状態をブロードキャスト
   const res = NextResponse.json({

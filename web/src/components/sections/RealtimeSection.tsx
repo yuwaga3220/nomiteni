@@ -17,7 +17,7 @@ export function RealtimeSection(props: RealtimeProps) {
   return (
     <section className="card">
       <h2>リアルタイム進行表示</h2>
-      <p>コート数: {props.state?.courtCount ?? "-"}</p>
+      <p>コート数: {props.active?.courtCount ?? "-"}</p>
       <p>大会: {props.active ? `${props.active.name} (${props.active.status})` : "未作成"}</p>
       <h3>現在の試合</h3>
       <div className="list">

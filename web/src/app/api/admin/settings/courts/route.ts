@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { COURT_KEY } from "@/lib/config";
 import { requireScopedAdminTournament } from "@/lib/admin-scope";
 import { getPrisma } from "@/lib/prisma";
 import { broadcastState } from "@/lib/tournament-service";
@@ -19,11 +18,6 @@ export async function POST(req: Request) {
   await prisma.tournament.update({
     where: { id: scoped.tournament.id },
     data: { courtCount: parsed.data.courtCount },
-  });
-  await prisma.appSetting.upsert({
-    where: { key: COURT_KEY },
-    update: { value: String(parsed.data.courtCount) },
-    create: { key: COURT_KEY, value: String(parsed.data.courtCount) },
   });
   await broadcastState();
   return NextResponse.json({ ok: true });

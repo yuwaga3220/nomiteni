@@ -47,7 +47,7 @@ export function HomePage() {
     setCreateTournamentEntryPasscode,
     createTournamentObserverPasscode,
     setCreateTournamentObserverPasscode,
-    active,
+    activeTournaments,
     isLoginReady,
     setMessage,
     setEntryTournament,
@@ -153,7 +153,7 @@ export function HomePage() {
         setCreateTournamentEntryPasscode={setCreateTournamentEntryPasscode}
         createTournamentObserverPasscode={createTournamentObserverPasscode}
         setCreateTournamentObserverPasscode={setCreateTournamentObserverPasscode}
-        activeTournament={active}
+        activeTournaments={activeTournaments}
         onParticipantOpen={actions.onParticipantOpen}
         onObserverLogin={actions.onObserverLogin}
         onAdminLogin={actions.onAdminLogin}

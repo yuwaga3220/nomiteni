@@ -91,6 +91,7 @@ model UserTournamentRole {
   tournamentId Int
   userId       Int
   role         UserRole
+  initialPosition Int?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
@@ -98,6 +99,7 @@ model UserTournamentRole {
   user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([tournamentId, userId, role])
+  @@unique([tournamentId, role, initialPosition])
   @@index([userId])
   @@index([tournamentId, role])
 }

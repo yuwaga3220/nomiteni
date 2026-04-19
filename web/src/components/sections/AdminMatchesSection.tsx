@@ -2,11 +2,11 @@
 // 管理者試合運営セクション
 "use client";
 
-import type { Match, PublicState } from "@/types";
+import type { Match } from "@/types";
 
 // 試合運営セクションのプロパティ
 type AdminMatchesProps = {
-  state: PublicState | null;
+  courtCount: number;
   matches: Match[];
   playerName: (id: number | null) => string; // IDからプレイヤー名を取得
   onAssignCourt: (matchId: number, court: number) => void; // 試合をコートに割り当てる処理
@@ -26,7 +26,7 @@ export function AdminMatchesSection(props: AdminMatchesProps) {
           </span>
           <select value={m.courtNumber ?? ""} onChange={(e) => props.onAssignCourt(m.id, Number(e.target.value))}>
             <option value="">コート選択</option>
-            {Array.from({ length: props.state?.courtCount ?? 1 }).map((_, idx) => (
+            {Array.from({ length: Math.max(1, props.courtCount) }).map((_, idx) => (
               <option key={idx + 1} value={idx + 1}>
                 コート {idx + 1}
               </option>

@@ -2,7 +2,6 @@
 // サーバー・API 用の設定
 
 export const JWT_SECRET = process.env.JWT_SECRET ?? "dev-secret";
-export const COURT_KEY = "courtCount";
 
 // Socket.IO の許可元
 export const SOCKET_ALLOWED_ORIGINS = [

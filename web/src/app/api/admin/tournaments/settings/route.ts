@@ -1,15 +1,40 @@
 import { NextResponse } from "next/server";
-import { COURT_KEY } from "@/lib/config";
 import { requireScopedAdminTournament } from "@/lib/admin-scope";
 import { getPrisma } from "@/lib/prisma";
 import { tournamentSettingsSchema } from "@/lib/schemas";
 import { broadcastState } from "@/lib/tournament-service";
 
+// 大会の設定を取得
 export async function GET() {
   const scoped = await requireScopedAdminTournament();
   if ("error" in scoped) return scoped.error;
 
+  const prisma = getPrisma();
   const t = scoped.tournament;
+  const participants = await (prisma as unknown as {
+    userTournamentRole: { // 参加者を取得
+      findMany: (args: unknown) => Promise<Array<{
+        userId: number;
+        initialPosition: number | null;
+        user: { name: string | null };
+      }>>;
+    };
+  }).userTournamentRole.findMany({ // 参加者を取得
+    where: {
+      tournamentId: t.id,
+      role: "PARTICIPANT",
+    },
+    orderBy: [{ initialPosition: "asc" }, { userId: "asc" }],
+    select: {
+      userId: true,
+      initialPosition: true,
+      user: {
+        select: {
+          name: true,
+        },
+      },
+    },
+  });
   return NextResponse.json({
     tournament: {
       id: t.id,
@@ -20,9 +45,15 @@ export async function GET() {
       entryPasscode: t.entryPasscode,
       observerPasscode: t.observerPasscode,
     },
+    participants: participants.map((p) => ({
+      userId: p.userId,
+      initialPosition: p.initialPosition,
+      name: p.user.name ?? `Player #${p.userId}`,
+    })),
   });
 }
 
+// 大会の設定を更新
 export async function POST(req: Request) {
   const scoped = await requireScopedAdminTournament();
   if ("error" in scoped) return scoped.error;
@@ -34,7 +65,7 @@ export async function POST(req: Request) {
   }
 
   const prisma = getPrisma();
-  await prisma.tournament.update({
+  await prisma.tournament.update({ // 大会の設定を更新
     where: { id: scoped.tournament.id },
     data: {
       name: parsed.data.name,
@@ -44,11 +75,6 @@ export async function POST(req: Request) {
       entryPasscode: parsed.data.entryPasscode,
       observerPasscode: parsed.data.observerPasscode,
     },
-  });
-  await prisma.appSetting.upsert({
-    where: { key: COURT_KEY },
-    update: { value: String(parsed.data.courtCount) },
-    create: { key: COURT_KEY, value: String(parsed.data.courtCount) },
   });
   await broadcastState();
   return NextResponse.json({ ok: true });

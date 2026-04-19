@@ -11,16 +11,28 @@ import { api, getSocket } from "@/lib/client/api";
 import type { AuthMode, CheckinState, Match, Me, PublicState, TournamentBrief, TournamentParticipant, User } from "@/types";
 import { NomiteniContext, type NomiteniContextValue } from "@/context/NomiteniContext";
 
+export type NomiteniBootstrapData = {
+  user: Me | null;
+  isLoggedIn: boolean;
+  state: PublicState;
+};
+
 // プロバイダーコンポーネント
-export function NomiteniProvider({ children }: { children: ReactNode }) {
+export function NomiteniProvider({
+  children,
+  initialData,
+}: {
+  children: ReactNode;
+  initialData: NomiteniBootstrapData;
+}) {
   // ルーターとパスを取得
   const router = useRouter();
   const pathname = usePathname();
 
   // ユーザー情報を管理
-  const [me, setMe] = useState<Me | null>(null);
+  const [me, setMe] = useState<Me | null>(initialData.user);
   // 状態を管理
-  const [state, setState] = useState<PublicState | null>(null);
+  const [state, setState] = useState<PublicState | null>(initialData.state);
   const [message, setMessage] = useState<string>("");
   const [forceLoginCardsView, setForceLoginCardsView] = useState(false);
 
@@ -50,7 +62,7 @@ export function NomiteniProvider({ children }: { children: ReactNode }) {
   const [tournamentTimeSlot, setTournamentTimeSlot] = useState("");
   const [courtCountInput, setCourtCountInput] = useState(2);
 
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(initialData.isLoggedIn);
   const isLoginReady = Boolean(authEmail && authPassword);
 
   // ユーザーIDからユーザー情報を取得
@@ -66,22 +78,20 @@ export function NomiteniProvider({ children }: { children: ReactNode }) {
   );
   // 状態を更新
   const refresh = async () => {
-    const [{ user, isLoggedIn }, data] = await Promise.all([
-      api<{ user: Me | null; isLoggedIn: boolean }>("/api/auth/me"), // ユーザー情報を取得
-      api<PublicState>("/api/public/state"), // 状態を取得
-    ]);
-    setMe(user);
-    setIsLoggedIn(isLoggedIn);
-    setState(data);
+    router.refresh();
     setMessage("");
   };
+
+  // Server Component で再取得した初期データを同期
+  useEffect(() => {
+    setMe(initialData.user);
+    setIsLoggedIn(initialData.isLoggedIn);
+    setState(initialData.state);
+  }, [initialData.user, initialData.isLoggedIn, initialData.state]);
 
   // マウント時に接続を確立し、アンマウント時に接続を解除
   useEffect(() => {
     let cancelled = false;
-    void refresh().catch((e: Error) => { // 初期更新
-      if (!cancelled) setMessage(e.message);
-    });
     const socket = getSocket();
     const onState = (next: PublicState) => setState(next);
     const onConnectError = () => {

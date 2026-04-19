@@ -58,6 +58,7 @@ export function AdminPage() {
   // 管理者ログインチェック
   if (!allowed || !me) return null;
 
+  // トーナメント編集用
   const bracketSize = Math.max(1, 2 ** Math.ceil(Math.log2(Math.max(1, tournamentParticipants.length))));
   const half = Math.max(1, bracketSize / 2);
   const normalized = tournamentParticipants

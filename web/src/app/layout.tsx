@@ -1,5 +1,9 @@
 import type { Metadata } from "next";
 import { AppProviders } from "./providers";
+import { toClientUser } from "@/lib/auth-server";
+import { getPrisma } from "@/lib/prisma";
+import { getSession } from "@/lib/session-cookie";
+import { buildPublicState } from "@/lib/tournament-service";
 import "./globals.css";
 
 // メタデータ
@@ -9,11 +13,33 @@ export const metadata: Metadata = {
 };
 
 // ルートレイアウト
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const session = await getSession();
+  const prisma = getPrisma();
+  const publicState = await buildPublicState();
+
+  let user = null;
+  let isLoggedIn = false;
+  if (session) {
+    const foundUser = await prisma.user.findUnique({ where: { id: session.userId } });
+    if (foundUser) {
+      user = toClientUser({ ...foundUser, scope: session.scope });
+      isLoggedIn = true;
+    }
+  }
+
   return (
     <html lang="ja">
       <body>
-        <AppProviders>{children}</AppProviders>
+        <AppProviders
+          initialData={{
+            user,
+            isLoggedIn,
+            state: publicState,
+          }}
+        >
+          {children}
+        </AppProviders>
       </body>
     </html>
   );

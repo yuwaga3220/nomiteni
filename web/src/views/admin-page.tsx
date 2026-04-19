@@ -6,7 +6,6 @@ import { useLayoutEffect } from "react";
 import { useRouter } from "next/navigation";
 import { AdminManagementSection, AdminMatchesSection, RealtimeSection } from "@/components/AppSections";
 import { useNomiteni } from "@/context/NomiteniContext";
-import type { TournamentParticipant } from "@/types";
 import { useAdminActions } from "./hooks/useAdminActions";
 
 // 管理者ページ
@@ -47,6 +46,7 @@ export function AdminPage() {
     courtCountInput,
     entrySetPasscode,
     observerSetPasscode,
+    tournamentParticipants,
   });
 
   const allowed = Boolean(me && !forceLoginCardsView && me.role === "ADMIN");
@@ -57,29 +57,6 @@ export function AdminPage() {
 
   // 管理者ログインチェック
   if (!allowed || !me) return null;
-
-  // トーナメント編集用
-  const bracketSize = Math.max(1, 2 ** Math.ceil(Math.log2(Math.max(1, tournamentParticipants.length))));
-  const half = Math.max(1, bracketSize / 2);
-  const normalized = tournamentParticipants
-    .map((participant) => ({
-      ...participant,
-      normalizedPosition: participant.initialPosition ?? Number.MAX_SAFE_INTEGER,
-    }))
-    .sort((a, b) => {
-      if (a.normalizedPosition !== b.normalizedPosition) return a.normalizedPosition - b.normalizedPosition;
-      return a.userId - b.userId;
-    });
-  const leftParticipants = normalized.filter((participant) => participant.normalizedPosition <= half);
-  const rightParticipants = normalized.filter((participant) => participant.normalizedPosition > half);
-
-  const renderParticipant = (participant: TournamentParticipant & { normalizedPosition: number }) => (
-    <div key={participant.userId} className="listItem">
-      <span>
-        #{participant.initialPosition ?? "-"} {participant.name}
-      </span>
-    </div>
-  );
 
   // 管理者ページを返す
   return (
@@ -115,16 +92,30 @@ export function AdminPage() {
       />
       <section className="card">
         <h2>トーナメント編集</h2>
-        <p>足の数: {bracketSize}（左右しきい値: {half}）</p>
-        <section className="grid2">
-          <div>
-            <h3>左側</h3>
-            <div className="list">{leftParticipants.map((participant) => renderParticipant(participant))}</div>
-          </div>
-          <div>
-            <h3>右側</h3>
-            <div className="list">{rightParticipants.map((participant) => renderParticipant(participant))}</div>
-          </div>
+        <p>足の数: {actions.bracketSize}</p>
+        <section className="tournamentBracket" style={{ height: actions.bracketHeight }}>
+          {actions.bracketRounds.map((round) => (
+            <div
+              key={round.title}
+              className={`tournamentBracketRound ${round.isSemifinal ? "isSemifinalRound" : ""}`}
+            >
+              <h3>{round.title}</h3>
+              <div
+                className="tournamentBracketMatches"
+                style={{ gap: `${round.matchGap}px`, padding: `${round.verticalPadding}px 0` }}
+              >
+                {round.matches.map((match, index) => (
+                  <div
+                    key={`${round.title}-${index}`}
+                    className={`tournamentBracketMatch ${round.isFinal ? "isFinalMatch" : ""}`}
+                  >
+                    <div className="tournamentBracketSlot">{match.topLabel}</div>
+                    <div className="tournamentBracketSlot">{match.bottomLabel}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
         </section>
       </section>
       {active && (

@@ -17,6 +17,7 @@ export function HomePage() {
   const {
     authModalState,
     setAuthModalState,
+    setMe,
     authEmail,
     setAuthEmail,
     authPassword,
@@ -59,6 +60,7 @@ export function HomePage() {
 
   const actions = useHomeActions({
     router,
+    setMe,
     setAuthModalState,
     isLoginReady,
     setMessage,

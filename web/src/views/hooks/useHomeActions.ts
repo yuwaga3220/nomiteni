@@ -3,10 +3,11 @@
 import { useState } from "react";
 import type { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { api } from "@/lib/client/api";
-import type { AuthMode, TournamentBrief } from "@/types";
+import type { AuthMode, Me, TournamentBrief } from "@/types";
 
 type UseHomeActionsParams = {
   router: AppRouterInstance;
+  setMe: (me: Me | null) => void;
   setAuthModalState: (mode: AuthMode) => void;
   isLoginReady: boolean;
   setMessage: (message: string) => void;
@@ -177,11 +178,12 @@ export function useHomeActions(params: UseHomeActionsParams) {
     (async () => {
       try {
         params.ensureLoginCredentials();
-        await api<{ user: unknown; tournamentId: number }>("/api/auth/admin", {
+        const result = await api<{ user: Me; tournamentId: number }>("/api/auth/admin", {
           method: "POST",
           body: JSON.stringify({ passcode: params.adminPasscode }),
         });
-        await params.refresh();
+        // /admin 遷移前に role を即時反映し、ガードによる誤リダイレクトを防ぐ
+        params.setMe(result.user);
         params.setForceLoginCardsView(false);
         params.router.replace("/admin");
       } catch (e) {

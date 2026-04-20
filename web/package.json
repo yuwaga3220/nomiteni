@@ -11,6 +11,7 @@
     "prisma:migrate": "prisma migrate dev"
   },
   "dependencies": {
+    "@g-loot/react-tournament-brackets": "^1.0.31-rc",
     "@prisma/adapter-better-sqlite3": "^7.6.0",
     "@prisma/client": "^7.6.0",
     "better-sqlite3": "^12.8.0",
@@ -19,8 +20,10 @@
     "next": "^15.5.9",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
+    "react-svg-pan-zoom": "^3.13.1",
     "socket.io": "^4.8.3",
     "socket.io-client": "^4.8.3",
+    "styled-components": "^6.4.0",
     "zod": "^4.3.6"
   },
   "devDependencies": {

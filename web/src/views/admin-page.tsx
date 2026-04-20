@@ -4,7 +4,7 @@
 
 import { useLayoutEffect } from "react";
 import { useRouter } from "next/navigation";
-import { AdminManagementSection, AdminMatchesSection, RealtimeSection } from "@/components/AppSections";
+import { AdminManagementSection, AdminTournamentBracketSection, AdminMatchesSection, RealtimeSection } from "@/components/AppSections";
 import { useNomiteni } from "@/context/NomiteniContext";
 import { useAdminActions } from "./hooks/useAdminActions";
 
@@ -90,34 +90,11 @@ export function AdminPage() {
         onSetAbsent={actions.onSetAbsent}
         onSetUnanswered={actions.onSetUnanswered}
       />
-      <section className="card">
-        <h2>トーナメント編集</h2>
-        <p>足の数: {actions.bracketSize}</p>
-        <section className="tournamentBracket" style={{ height: actions.bracketHeight }}>
-          {actions.bracketRounds.map((round) => (
-            <div
-              key={round.title}
-              className={`tournamentBracketRound ${round.isSemifinal ? "isSemifinalRound" : ""}`}
-            >
-              <h3>{round.title}</h3>
-              <div
-                className="tournamentBracketMatches"
-                style={{ gap: `${round.matchGap}px`, padding: `${round.verticalPadding}px 0` }}
-              >
-                {round.matches.map((match, index) => (
-                  <div
-                    key={`${round.title}-${index}`}
-                    className={`tournamentBracketMatch ${round.isFinal ? "isFinalMatch" : ""}`}
-                  >
-                    <div className="tournamentBracketSlot">{match.topLabel}</div>
-                    <div className="tournamentBracketSlot">{match.bottomLabel}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
-        </section>
-      </section>
+      <AdminTournamentBracketSection
+        bracketSize={actions.bracketSize}
+        bracketHeight={actions.bracketHeight}
+        bracketRounds={actions.bracketRounds}
+      />
       {active && (
         <AdminMatchesSection
           courtCount={active.courtCount ?? 1}
@@ -134,6 +111,8 @@ export function AdminPage() {
         groupedRounds={groupedRounds}
         playerName={playerName}
         matchStatusLabel={matchStatusLabel}
+        bracketSize={actions.bracketSize}
+        bracketRounds={actions.bracketRounds}
       />
     </>
   );

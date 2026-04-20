@@ -15,6 +15,7 @@ export type NomiteniBootstrapData = {
   user: Me | null;
   isLoggedIn: boolean;
   state: PublicState;
+  sessionTournamentId: number | null;
 };
 
 // プロバイダーコンポーネント
@@ -63,6 +64,7 @@ export function NomiteniProvider({
   const [courtCountInput, setCourtCountInput] = useState(2);
 
   const [isLoggedIn, setIsLoggedIn] = useState(initialData.isLoggedIn);
+  const [sessionTournamentId, setSessionTournamentId] = useState<number | null>(initialData.sessionTournamentId);
   const isLoginReady = Boolean(authEmail && authPassword);
 
   // ユーザーIDからユーザー情報を取得
@@ -71,7 +73,16 @@ export function NomiteniProvider({
     [state?.users],
   );
   const activeTournaments = state?.activeTournaments ?? [];
-  const active = activeTournaments[0] ?? null;
+  const active = useMemo(() => {
+    if ((me?.role === "ADMIN" || me?.role === "OBSERVER") && sessionTournamentId) {
+      return (
+        activeTournaments.find((tournament) => tournament.id === sessionTournamentId)
+        ?? activeTournaments[0]
+        ?? null
+      );
+    }
+    return activeTournaments[0] ?? null;
+  }, [activeTournaments, me?.role, sessionTournamentId]);
   // 試合を割り当て可能な試合を取得
   const assignableMatches = (active?.matches ?? []).filter(
     (m) => m.status !== "COMPLETED" && m.player1Id && m.player2Id,
@@ -87,7 +98,8 @@ export function NomiteniProvider({
     setMe(initialData.user);
     setIsLoggedIn(initialData.isLoggedIn);
     setState(initialData.state);
-  }, [initialData.user, initialData.isLoggedIn, initialData.state]);
+    setSessionTournamentId(initialData.sessionTournamentId);
+  }, [initialData.user, initialData.isLoggedIn, initialData.state, initialData.sessionTournamentId]);
 
   // マウント時に接続を確立し、アンマウント時に接続を解除
   useEffect(() => {

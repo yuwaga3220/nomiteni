@@ -7,5 +7,6 @@ export { HeaderAuthButtons } from "./sections/HeaderAuthButtons";
 export { AuthModal } from "./modals/AuthModal";
 export { HomeAccessSection } from "./sections/HomeAccessSection";
 export { AdminManagementSection } from "./sections/AdminManagementSection";
+export { AdminTournamentBracketSection } from "./sections/AdminTournamentBracketSection";
 export { AdminMatchesSection } from "./sections/AdminMatchesSection";
 export { RealtimeSection } from "./sections/RealtimeSection";

@@ -4,6 +4,7 @@ import { toClientUser } from "@/lib/auth-server";
 import { getPrisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session-cookie";
 import { buildPublicState } from "@/lib/tournament-service";
+import type { Me } from "@/types";
 import "./globals.css";
 
 // メタデータ
@@ -18,12 +19,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const prisma = getPrisma();
   const publicState = await buildPublicState();
 
-  let user = null;
+  let user: Me | null = null;
   let isLoggedIn = false;
   if (session) {
     const foundUser = await prisma.user.findUnique({ where: { id: session.userId } });
     if (foundUser) {
-      user = toClientUser({ ...foundUser, scope: session.scope });
+      user = toClientUser({ ...foundUser, scope: session.scope }) as Me;
       isLoggedIn = true;
     }
   }
@@ -36,6 +37,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             user,
             isLoggedIn,
             state: publicState,
+            sessionTournamentId: session?.tournamentId ?? null,
           }}
         >
           {children}

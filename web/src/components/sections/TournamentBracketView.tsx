@@ -4,6 +4,7 @@
 
 import { useMemo } from "react";
 import { Match, MATCH_STATES, SingleEliminationBracket, createTheme } from "@g-loot/react-tournament-brackets";
+import { StyleSheetManager } from "styled-components";
 
 type BracketMatchView = {
   topLabel: string;
@@ -22,6 +23,7 @@ export type BracketRoundView = {
 type TournamentBracketViewProps = {
   bracketRounds: BracketRoundView[];
   showRoundHeaders?: boolean;
+  showMatchDescription?: boolean;
 };
 
 type LibMatchParticipant = {
@@ -77,11 +79,12 @@ const lightBlueTheme = createTheme({
 function roundTextGenerator(currentRound: number, totalRounds: number): string {
   if (currentRound === totalRounds) return "決勝";
   if (currentRound === totalRounds - 1) return "準決勝";
-  return `R${currentRound}`;
+  return `${currentRound}回戦`;
 }
 
 // ブラケット描画コンポーネント
 export function TournamentBracketView(props: TournamentBracketViewProps) {
+  // 試合を作成
   const matches = useMemo<LibMatch[]>(() => {
     const roundCount = props.bracketRounds.length;
     return props.bracketRounds.flatMap((round, roundIndex) =>
@@ -94,7 +97,7 @@ export function TournamentBracketView(props: TournamentBracketViewProps) {
 
         return {
           id,
-          name: `${round.title} ${matchIndex + 1}`,
+          name: props.showMatchDescription === false ? "" : `${round.title} ${matchIndex + 1}`,
           nextMatchId,
           tournamentRoundText: round.title,
           startTime: "",
@@ -118,30 +121,36 @@ export function TournamentBracketView(props: TournamentBracketViewProps) {
         };
       }),
     );
-  }, [props.bracketRounds]);
+  }, [props.bracketRounds, props.showMatchDescription]);
 
   if (!matches.length) return null;
 
   return (
     <div style={{ overflowX: "auto" }}>
-      <SingleEliminationBracket
-        matches={matches}
-        matchComponent={Match}
-        theme={lightBlueTheme}
-        options={{
-          style: {
-            roundHeader: {
-              isShown: props.showRoundHeaders ?? false,
-              backgroundColor: lightBlueTheme.roundHeaders.background,
-              fontColor: lightBlueTheme.textColor.main,
-              fontSize: 16,
-              roundTextGenerator,
+      <StyleSheetManager
+        shouldForwardProp={(prop, target) =>
+          typeof target !== "string" || !["won", "hovered", "highlighted"].includes(prop)
+        }
+      >
+        <SingleEliminationBracket
+          matches={matches}
+          matchComponent={Match}
+          theme={lightBlueTheme}
+          options={{
+            style: {
+              roundHeader: {
+                isShown: props.showRoundHeaders ?? false,
+                backgroundColor: lightBlueTheme.roundHeaders.background,
+                fontColor: lightBlueTheme.textColor.main,
+                fontSize: 16,
+                roundTextGenerator,
+              },
+              connectorColor: lightBlueTheme.connectorColor,
+              connectorColorHighlight: lightBlueTheme.connectorColorHighlight,
             },
-            connectorColor: lightBlueTheme.connectorColor,
-            connectorColorHighlight: lightBlueTheme.connectorColorHighlight,
-          },
-        }}
-      />
+          }}
+        />
+      </StyleSheetManager>
     </div>
   );
 }

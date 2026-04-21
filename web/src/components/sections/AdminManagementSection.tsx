@@ -4,6 +4,8 @@
 
 import type { CheckinState, PublicState, Tournament, User } from "@/types";
 
+type TournamentStatus = "ENTRY" | "READY" | "RUNNING" | "FINISHED";
+
 // 管理者メニューセクションのプロパティ
 type AdminManagementProps = {
   active: Tournament | null | undefined;
@@ -22,6 +24,7 @@ type AdminManagementProps = {
   setEntrySetPasscode: (v: string) => void;
   checkinState: (u: User) => CheckinState;
   onSaveTournamentSettings: () => void;
+  onSetTournamentStatus: (status: TournamentStatus) => void;
   onSetReady: (userId: number) => void;
   onSetAbsent: (userId: number) => void;
   onSetUnanswered: (userId: number) => void;
@@ -34,6 +37,33 @@ export function AdminManagementSection(props: AdminManagementProps) {
     <section className="grid2">
       <div className="card">
         <h2>大会管理</h2>
+        <div className="row">
+          <label>大会状態</label>
+          <button
+            className={props.active?.status === "ENTRY" ? "activeStateButton" : "inactiveStateButton"}
+            onClick={() => props.onSetTournamentStatus("ENTRY")}
+          >
+            ENTRY
+          </button>
+          <button
+            className={props.active?.status === "READY" ? "activeStateButton" : "inactiveStateButton"}
+            onClick={() => props.onSetTournamentStatus("READY")}
+          >
+            READY
+          </button>
+          <button
+            className={props.active?.status === "RUNNING" ? "activeStateButton" : "inactiveStateButton"}
+            onClick={() => props.onSetTournamentStatus("RUNNING")}
+          >
+            RUNNING
+          </button>
+          <button
+            className={props.active?.status === "FINISHED" ? "activeStateButton" : "inactiveStateButton"}
+            onClick={() => props.onSetTournamentStatus("FINISHED")}
+          >
+            FINISHED
+          </button>
+        </div>
         <label>大会名</label>
         <input value={props.tournamentName} onChange={(e) => props.setTournamentName(e.target.value)} />
         <label>開催日</label>
@@ -61,13 +91,13 @@ export function AdminManagementSection(props: AdminManagementProps) {
           onChange={(e) => props.setObserverSetPasscode(e.target.value)}
         />
         <button onClick={props.onSaveTournamentSettings}>大会設定を保存</button>
+        
         {props.active && (
           <div className="message">
-            <strong>現在の大会</strong>: {props.active.name} (ID: {props.active.id})
+            <strong>現在の大会</strong>: {props.active.name} (ID: {props.active.id}) / 状態: {props.active.status}
           </div>
         )}
       </div>
-
       <div className="card">
         <h2>参加者チェックイン（管理者操作）</h2>
         <div className="list">

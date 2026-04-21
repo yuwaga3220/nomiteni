@@ -12,6 +12,8 @@ type UseAdminTournamentSettingsActionsParams = {
   observerSetPasscode: string;
 };
 
+type TournamentStatus = "ENTRY" | "READY" | "RUNNING" | "FINISHED";
+
 // 大会設定を保存する
 export function useAdminTournamentSettingsActions(params: UseAdminTournamentSettingsActionsParams) {
   const onSaveTournamentSettings = () =>
@@ -29,7 +31,17 @@ export function useAdminTournamentSettingsActions(params: UseAdminTournamentSett
       }),
     );
 
+  // 大会のstatusを更新
+  const onSetTournamentStatus = (status: TournamentStatus) =>
+    params.call(() =>
+      api("/api/admin/tournaments/status", {
+        method: "POST",
+        body: JSON.stringify({ status }),
+      }),
+    );
+
   return {
     onSaveTournamentSettings,
+    onSetTournamentStatus,
   };
 }

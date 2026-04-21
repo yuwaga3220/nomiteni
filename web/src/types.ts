@@ -34,7 +34,7 @@ export type Tournament = {
   courtCount?: number;
   entryPasscode?: string | null;
   observerPasscode?: string | null;
-  status: string;
+  status: "ENTRY" | "READY" | "RUNNING" | "FINISHED";
   matches: Match[];
 };
 export type TournamentBrief = {
@@ -45,7 +45,7 @@ export type TournamentBrief = {
   courtCount?: number;
   entryPasscode?: string | null;
   observerPasscode?: string | null;
-  status: string;
+  status: "ENTRY" | "READY" | "RUNNING" | "FINISHED";
 };
 
 export type TournamentParticipant = {

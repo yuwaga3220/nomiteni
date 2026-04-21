@@ -47,6 +47,7 @@ export function useAdminActions(params: UseAdminActionsParams) {
     bracketRounds: bracketPreview.bracketRounds,
     bracketHeight: bracketPreview.bracketHeight,
     onSaveTournamentSettings: tournamentSettingsActions.onSaveTournamentSettings,
+    onSetTournamentStatus: tournamentSettingsActions.onSetTournamentStatus,
     onSetReady: participantActions.onSetReady,
     onSetAbsent: participantActions.onSetAbsent,
     onSetUnanswered: participantActions.onSetUnanswered,

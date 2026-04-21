@@ -68,8 +68,8 @@ export function RealtimeSection(props: RealtimeProps) {
   return (
     <section className="card">
       <h2>トーナメント進行状態</h2>
-      <p>コート数: {props.active?.courtCount ?? "-"}</p>
-      <p>大会: {props.active ? `${props.active.name} (${props.active.status})` : "未作成"}</p>
+      <p>大会： {props.active ? `${props.active.name} (${props.active.status})` : "未作成"}</p>
+      <p>コート数： {props.active?.courtCount ?? "-"}</p>
       <h3>進行中の試合</h3>
       <div className="list">
         {inProgressMatches.length === 0 && <div className="statusText">現在進行中の試合はありません</div>}
@@ -83,8 +83,11 @@ export function RealtimeSection(props: RealtimeProps) {
         ))}
       </div>
       <h3>トーナメント表</h3>
-      <p>足の数: {displayBracketSize}</p>
-      <TournamentBracketView bracketRounds={displayBracketRounds} showRoundHeaders={true} />
+      <TournamentBracketView
+        bracketRounds={displayBracketRounds}
+        showRoundHeaders={true}
+        showMatchDescription={true}
+      />
     </section>
   );
 }

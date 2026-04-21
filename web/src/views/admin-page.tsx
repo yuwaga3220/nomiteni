@@ -4,7 +4,7 @@
 
 import { useLayoutEffect } from "react";
 import { useRouter } from "next/navigation";
-import { AdminManagementSection, AdminTournamentBracketSection, AdminMatchesSection, RealtimeSection } from "@/components/AppSections";
+import { AdminManagementSection, AdminTournamentEditSection, AdminMatchesSection, RealtimeSection } from "@/components/AppSections";
 import { useNomiteni } from "@/context/NomiteniContext";
 import { useAdminActions } from "./hooks/useAdminActions";
 
@@ -63,11 +63,8 @@ export function AdminPage() {
     <>
       <section className="card">
         <h2>管理者メニュー</h2>
-        <p>
-          ログイン中: {me.name} ({me.email})
-        </p>
         <br />
-        <button onClick={() => router.push("/")}>戻る</button>
+        <button onClick={() => router.push("/")}>ホームに戻る</button>
       </section>
       <AdminManagementSection
         active={active}
@@ -86,11 +83,12 @@ export function AdminPage() {
         setEntrySetPasscode={setEntrySetPasscode}
         checkinState={checkinState}
         onSaveTournamentSettings={actions.onSaveTournamentSettings}
+        onSetTournamentStatus={actions.onSetTournamentStatus}
         onSetReady={actions.onSetReady}
         onSetAbsent={actions.onSetAbsent}
         onSetUnanswered={actions.onSetUnanswered}
       />
-      <AdminTournamentBracketSection
+      <AdminTournamentEditSection
         bracketSize={actions.bracketSize}
         bracketHeight={actions.bracketHeight}
         bracketRounds={actions.bracketRounds}

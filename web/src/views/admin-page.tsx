@@ -39,8 +39,9 @@ export function AdminPage() {
     call,
   } = useNomiteni();
 
-  const [selectedParticipantId, setSelectedParticipantId] = useState<number | null>(null);
-  
+  const [selectedParticipantId1, setSelectedParticipantId1] = useState<number | null>(null);
+  const [selectedParticipantId2, setSelectedParticipantId2] = useState<number | null>(null);
+
   const actions = useAdminActions({
     call,
     tournamentName,
@@ -97,8 +98,11 @@ export function AdminPage() {
         bracketRounds={actions.bracketRounds}
         tournamentStatus={active?.status}
         participants={tournamentParticipants}
-        selectedParticipantId={selectedParticipantId}
-        setSelectedParticipantId={setSelectedParticipantId}
+        selectedParticipantId1={selectedParticipantId1}
+        setSelectedParticipantId1={setSelectedParticipantId1}
+        selectedParticipantId2={selectedParticipantId2}
+        setSelectedParticipantId2={setSelectedParticipantId2}
+        onSwapParticipants={actions.onSwapParticipants}
 />
       {active && (
         <AdminMatchesSection

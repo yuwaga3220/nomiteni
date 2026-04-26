@@ -54,5 +54,6 @@ export function useAdminActions(params: UseAdminActionsParams) {
     onAssignCourt: matchActions.onAssignCourt,
     onStart: matchActions.onStart,
     onWin: matchActions.onWin,
+    onSwapParticipants: participantActions.onSwapParticipants,
   };
 }

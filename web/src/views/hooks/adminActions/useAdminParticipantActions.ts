@@ -35,9 +35,20 @@ export function useAdminParticipantActions(params: UseAdminParticipantActionsPar
       }),
     );
 
+  // 参加者の初期位置を交換する
+  const onSwapParticipants = async (id1: number | null, id2: number | null) => {
+    await params.call(() =>
+      api(`/api/admin/participants/swap`, {
+        method: "POST",
+        body: JSON.stringify({ id1, id2 }),
+      }),
+    );
+    window.location.reload();
+  };
   return {
     onSetReady,
     onSetAbsent,
     onSetUnanswered,
+    onSwapParticipants,
   };
 }

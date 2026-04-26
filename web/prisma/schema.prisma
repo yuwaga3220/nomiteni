@@ -12,7 +12,8 @@ datasource db {
 }
 
 enum TournamentStatus {
-  DRAFT
+  ENTRY
+  READY
   RUNNING
   FINISHED
 }
@@ -51,7 +52,7 @@ model Tournament {
   eventDate        String?
   timeSlot         String?
   courtCount       Int                  @default(2)
-  status           TournamentStatus     @default(DRAFT)
+  status           TournamentStatus     @default(ENTRY)
   observerPasscode String?
   entryPasscode    String?
   createdAt        DateTime             @default(now())

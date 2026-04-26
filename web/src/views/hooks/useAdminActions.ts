@@ -1,6 +1,10 @@
 "use client";
 
-import { api } from "@/lib/client/api";
+import type { TournamentParticipant } from "@/types";
+import { useAdminBracketPreview } from "./adminActions/useAdminBracketPreview";
+import { useAdminTournamentSettingsActions } from "./adminActions/useAdminTournamentSettingsActions";
+import { useAdminParticipantActions } from "./adminActions/useAdminParticipantActions";
+import { useAdminMatchActions } from "./adminActions/useAdminMatchActions";
 
 type UseAdminActionsParams = {
   call: (fn: () => Promise<unknown>) => Promise<void>;
@@ -10,73 +14,46 @@ type UseAdminActionsParams = {
   courtCountInput: number;
   entrySetPasscode: string;
   observerSetPasscode: string;
+  tournamentParticipants: TournamentParticipant[];
 };
 
+// 管理者アクションを返す
 export function useAdminActions(params: UseAdminActionsParams) {
-  const onSaveTournamentSettings = () =>
-    params.call(() =>
-      api("/api/admin/tournaments/settings", {
-        method: "POST",
-        body: JSON.stringify({
-          name: params.tournamentName,
-          eventDate: params.tournamentDate || null,
-          timeSlot: params.tournamentTimeSlot || null,
-          courtCount: params.courtCountInput,
-          entryPasscode: params.entrySetPasscode,
-          observerPasscode: params.observerSetPasscode,
-        }),
-      }),
-    );
+  // ブラケットプレビューを取得
+  const bracketPreview = useAdminBracketPreview({
+    tournamentParticipants: params.tournamentParticipants,
+  });
 
-  const onSetReady = (id: number) =>
-    params.call(() =>
-      api(`/api/admin/participants/${id}/checkin`, {
-        method: "POST",
-        body: JSON.stringify({ checkedIn: true, canPlayToday: true }),
-      }),
-    );
+  const tournamentSettingsActions = useAdminTournamentSettingsActions({
+    call: params.call,
+    tournamentName: params.tournamentName,
+    tournamentDate: params.tournamentDate,
+    tournamentTimeSlot: params.tournamentTimeSlot,
+    courtCountInput: params.courtCountInput,
+    entrySetPasscode: params.entrySetPasscode,
+    observerSetPasscode: params.observerSetPasscode,
+  });
 
-  const onSetAbsent = (id: number) =>
-    params.call(() =>
-      api(`/api/admin/participants/${id}/checkin`, {
-        method: "POST",
-        body: JSON.stringify({ checkedIn: true, canPlayToday: false }),
-      }),
-    );
+  const participantActions = useAdminParticipantActions({
+    call: params.call,
+  });
 
-  const onSetUnanswered = (id: number) =>
-    params.call(() =>
-      api(`/api/admin/participants/${id}/checkin`, {
-        method: "POST",
-        body: JSON.stringify({ checkedIn: false, canPlayToday: null }),
-      }),
-    );
-
-  const onAssignCourt = (matchId: number, courtNumber: number) =>
-    params.call(() =>
-      api(`/api/admin/matches/${matchId}/assign`, {
-        method: "POST",
-        body: JSON.stringify({ courtNumber }),
-      }),
-    );
-
-  const onStart = (matchId: number) => params.call(() => api(`/api/admin/matches/${matchId}/start`, { method: "POST" }));
-
-  const onWin = (matchId: number, winnerId: number | null) =>
-    params.call(() =>
-      api(`/api/admin/matches/${matchId}/result`, {
-        method: "POST",
-        body: JSON.stringify({ winnerId }),
-      }),
-    );
+  const matchActions = useAdminMatchActions({
+    call: params.call,
+  });
 
   return {
-    onSaveTournamentSettings,
-    onSetReady,
-    onSetAbsent,
-    onSetUnanswered,
-    onAssignCourt,
-    onStart,
-    onWin,
+    bracketSize: bracketPreview.bracketSize,
+    bracketRounds: bracketPreview.bracketRounds,
+    bracketHeight: bracketPreview.bracketHeight,
+    onSaveTournamentSettings: tournamentSettingsActions.onSaveTournamentSettings,
+    onSetTournamentStatus: tournamentSettingsActions.onSetTournamentStatus,
+    onSetReady: participantActions.onSetReady,
+    onSetAbsent: participantActions.onSetAbsent,
+    onSetUnanswered: participantActions.onSetUnanswered,
+    onAssignCourt: matchActions.onAssignCourt,
+    onStart: matchActions.onStart,
+    onWin: matchActions.onWin,
+    onSwapParticipants: participantActions.onSwapParticipants,
   };
 }

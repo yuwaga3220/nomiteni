@@ -52,3 +52,7 @@ export const tournamentSettingsSchema = z.object({
   entryPasscode: z.string().min(4).max(64),
   observerPasscode: z.string().min(4).max(64),
 });
+
+export const tournamentStatusSchema = z.object({
+  status: z.enum(["ENTRY", "READY", "RUNNING", "FINISHED"]),
+});

@@ -188,6 +188,153 @@ button:disabled:active {
   min-width: 200px;
 }
 
+.tournamentBracket {
+  --bracket-gap: 72px;
+  --branch-line: 25px;
+  --trunk-line: calc(var(--bracket-gap) - var(--branch-line) - 21px);
+  --merge-line: calc(var(--branch-line) + 25px);
+  --merge-trunk-line: calc(var(--bracket-gap) - var(--merge-line));
+  --bracket-line-width: 2px;
+  --bracket-line-color: #8ca2cb;
+  display: flex;
+  gap: var(--bracket-gap);
+  overflow-x: auto;
+  padding-bottom: 8px;
+}
+
+.tournamentBracketRound {
+  min-width: 240px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tournamentBracketRound h3 {
+  margin: 0;
+}
+
+.tournamentBracketMatches {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 12px;
+}
+
+.isSemifinalRound .tournamentBracketMatches {
+  position: relative;
+}
+
+.isSemifinalRound .tournamentBracketMatches::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: calc(-1 * var(--bracket-gap));
+  width: var(--merge-trunk-line);
+  border-top: var(--bracket-line-width) solid var(--bracket-line-color);
+}
+
+.isSemifinalRound .tournamentBracketMatches::after {
+  content: "";
+  position: absolute;
+  top: 23%;
+  bottom: 24%;
+  right: calc(-1 * var(--merge-line));
+  border-right: var(--bracket-line-width) solid var(--bracket-line-color);
+}
+
+.tournamentBracketMatch {
+  position: relative;
+  border: 1px solid #d4dced;
+  border-radius: 8px;
+  background: #fafcff;
+}
+
+.tournamentBracketMatch::before {
+  content: "";
+  position: absolute;
+  top: 25%;
+  bottom: 24%;
+  right: calc(-1 * var(--branch-line));
+  border-right: var(--bracket-line-width) solid var(--bracket-line-color);
+}
+
+.tournamentBracketMatch::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: calc(-1 * var(--bracket-gap) + 21px);
+  width: var(--trunk-line);
+  border-top: var(--bracket-line-width) solid var(--bracket-line-color);
+}
+
+.tournamentBracketSlot {
+  position: relative;
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+}
+
+.tournamentBracketMatch:not(.isFinalMatch) .tournamentBracketSlot::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: calc(-1 * var(--branch-line));
+  width: var(--branch-line);
+  border-top: var(--bracket-line-width) solid var(--bracket-line-color);
+}
+
+.tournamentBracketSlot + .tournamentBracketSlot {
+  border-top: 1px solid #e2e8f5;
+}
+
+.tournamentBracketConnectorOnly {
+  min-height: 74px;
+  border: none;
+  background: transparent;
+}
+
+.tournamentBracketEdit {
+  --bracket-gap: 75px;
+  --branch-line: 28px;
+}
+
+.tournamentBracketEdit .tournamentBracketMatch:not(.tournamentBracketConnectorOnly)::after {
+  display: none;
+}
+
+.tournamentBracketEdit .tournamentBracketMatch:not(.tournamentBracketConnectorOnly) .tournamentBracketSlot + .tournamentBracketSlot::before {
+  content: "";
+  position: absolute;
+  top: 0px;
+  right: calc(-1 * var(--bracket-gap) + 21px);
+  width: var(--trunk-line);
+  border-top: var(--bracket-line-width) solid var(--bracket-line-color);
+}
+
+.tournamentBracketEdit .tournamentBracketConnectorOnly::before {
+  top: 36%;
+  bottom: 36%;
+}
+
+.tournamentBracketEdit .isSemifinalRound .tournamentBracketMatches::after {
+  top: 20%;
+  bottom: 37%;
+}
+
+.tournamentBracketEdit .isSemifinalRound .tournamentBracketMatches::before {
+  top: 40%;
+}
+
+.isFinalMatch::after {
+  display: none;
+}
+
+.isFinalMatch::before {
+  display: none;
+}
+
 .bracketCard {
   border: 1px solid #d4dced;
   border-radius: 8px;

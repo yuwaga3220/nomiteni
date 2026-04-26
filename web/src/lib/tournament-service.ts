@@ -26,7 +26,14 @@ export async function buildPublicState() {
   const prisma = getPrisma();
   const activeTournaments = await prisma.tournament.findMany({
     where: {
-      status: { in: [TournamentStatus.DRAFT, TournamentStatus.RUNNING] },
+      status: {
+        in: [
+          TournamentStatus.ENTRY,
+          TournamentStatus.READY,
+          TournamentStatus.RUNNING,
+          TournamentStatus.FINISHED,
+        ],
+      },
     },
     orderBy: { createdAt: "desc" },
     select: {
@@ -66,12 +73,12 @@ export async function buildPublicState() {
   return { users, activeTournaments };
 }
 
-// 観戦パスコードが一致するアクティブなトーナメントをひとつだけ取得
+// 観戦パスコードが一致するRUNNING OR FINISHEDのトーナメントをひとつだけ取得
 export async function getActiveTournamentByObserverPasscode(passcode: string) {
   const prisma = getPrisma();
   return prisma.tournament.findFirst({
     where: {
-      status: { in: [TournamentStatus.DRAFT, TournamentStatus.RUNNING] },
+      status: { in: [TournamentStatus.RUNNING, TournamentStatus.FINISHED] },
       observerPasscode: passcode,
     },
     orderBy: { createdAt: "desc" },
@@ -83,7 +90,7 @@ export async function findActiveTournamentByEntryPasscode(passcode: string) {
   const prisma = getPrisma();
   return prisma.tournament.findFirst({
     where: {
-      status: { in: [TournamentStatus.DRAFT, TournamentStatus.RUNNING] },
+      status: { in: [TournamentStatus.ENTRY] },
       entryPasscode: passcode,
     },
     orderBy: { createdAt: "desc" },

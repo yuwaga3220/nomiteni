@@ -2,11 +2,10 @@
 // 管理者ページ
 "use client";
 
-import { useLayoutEffect } from "react";
+import { useLayoutEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { AdminManagementSection, AdminMatchesSection, RealtimeSection } from "@/components/AppSections";
+import { AdminManagementSection, AdminTournamentEditSection, AdminMatchesSection, RealtimeSection } from "@/components/AppSections";
 import { useNomiteni } from "@/context/NomiteniContext";
-import type { TournamentParticipant } from "@/types";
 import { useAdminActions } from "./hooks/useAdminActions";
 
 // 管理者ページ
@@ -39,6 +38,10 @@ export function AdminPage() {
     tournamentParticipants,
     call,
   } = useNomiteni();
+
+  const [selectedParticipantId1, setSelectedParticipantId1] = useState<number | null>(null);
+  const [selectedParticipantId2, setSelectedParticipantId2] = useState<number | null>(null);
+
   const actions = useAdminActions({
     call,
     tournamentName,
@@ -47,6 +50,7 @@ export function AdminPage() {
     courtCountInput,
     entrySetPasscode,
     observerSetPasscode,
+    tournamentParticipants,
   });
 
   const allowed = Boolean(me && !forceLoginCardsView && me.role === "ADMIN");
@@ -58,39 +62,13 @@ export function AdminPage() {
   // 管理者ログインチェック
   if (!allowed || !me) return null;
 
-  // トーナメント編集用
-  const bracketSize = Math.max(1, 2 ** Math.ceil(Math.log2(Math.max(1, tournamentParticipants.length))));
-  const half = Math.max(1, bracketSize / 2);
-  const normalized = tournamentParticipants
-    .map((participant) => ({
-      ...participant,
-      normalizedPosition: participant.initialPosition ?? Number.MAX_SAFE_INTEGER,
-    }))
-    .sort((a, b) => {
-      if (a.normalizedPosition !== b.normalizedPosition) return a.normalizedPosition - b.normalizedPosition;
-      return a.userId - b.userId;
-    });
-  const leftParticipants = normalized.filter((participant) => participant.normalizedPosition <= half);
-  const rightParticipants = normalized.filter((participant) => participant.normalizedPosition > half);
-
-  const renderParticipant = (participant: TournamentParticipant & { normalizedPosition: number }) => (
-    <div key={participant.userId} className="listItem">
-      <span>
-        #{participant.initialPosition ?? "-"} {participant.name}
-      </span>
-    </div>
-  );
-
   // 管理者ページを返す
   return (
     <>
       <section className="card">
         <h2>管理者メニュー</h2>
-        <p>
-          ログイン中: {me.name} ({me.email})
-        </p>
         <br />
-        <button onClick={() => router.push("/")}>戻る</button>
+        <button onClick={() => router.push("/")}>ホームに戻る</button>
       </section>
       <AdminManagementSection
         active={active}
@@ -109,24 +87,23 @@ export function AdminPage() {
         setEntrySetPasscode={setEntrySetPasscode}
         checkinState={checkinState}
         onSaveTournamentSettings={actions.onSaveTournamentSettings}
+        onSetTournamentStatus={actions.onSetTournamentStatus}
         onSetReady={actions.onSetReady}
         onSetAbsent={actions.onSetAbsent}
         onSetUnanswered={actions.onSetUnanswered}
       />
-      <section className="card">
-        <h2>トーナメント編集</h2>
-        <p>足の数: {bracketSize}（左右しきい値: {half}）</p>
-        <section className="grid2">
-          <div>
-            <h3>左側</h3>
-            <div className="list">{leftParticipants.map((participant) => renderParticipant(participant))}</div>
-          </div>
-          <div>
-            <h3>右側</h3>
-            <div className="list">{rightParticipants.map((participant) => renderParticipant(participant))}</div>
-          </div>
-        </section>
-      </section>
+      <AdminTournamentEditSection
+        bracketSize={actions.bracketSize}
+        bracketHeight={actions.bracketHeight}
+        bracketRounds={actions.bracketRounds}
+        tournamentStatus={active?.status}
+        participants={tournamentParticipants}
+        selectedParticipantId1={selectedParticipantId1}
+        setSelectedParticipantId1={setSelectedParticipantId1}
+        selectedParticipantId2={selectedParticipantId2}
+        setSelectedParticipantId2={setSelectedParticipantId2}
+        onSwapParticipants={actions.onSwapParticipants}
+/>
       {active && (
         <AdminMatchesSection
           courtCount={active.courtCount ?? 1}
@@ -143,6 +120,8 @@ export function AdminPage() {
         groupedRounds={groupedRounds}
         playerName={playerName}
         matchStatusLabel={matchStatusLabel}
+        bracketSize={actions.bracketSize}
+        bracketRounds={actions.bracketRounds}
       />
     </>
   );

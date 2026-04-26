@@ -2,7 +2,7 @@
 // 管理者ページ
 "use client";
 
-import { useLayoutEffect } from "react";
+import { useLayoutEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AdminManagementSection, AdminTournamentEditSection, AdminMatchesSection, RealtimeSection } from "@/components/AppSections";
 import { useNomiteni } from "@/context/NomiteniContext";
@@ -38,6 +38,9 @@ export function AdminPage() {
     tournamentParticipants,
     call,
   } = useNomiteni();
+
+  const [selectedParticipantId, setSelectedParticipantId] = useState<number | null>(null);
+  
   const actions = useAdminActions({
     call,
     tournamentName,
@@ -92,7 +95,11 @@ export function AdminPage() {
         bracketSize={actions.bracketSize}
         bracketHeight={actions.bracketHeight}
         bracketRounds={actions.bracketRounds}
-      />
+        tournamentStatus={active?.status}
+        participants={tournamentParticipants}
+        selectedParticipantId={selectedParticipantId}
+        setSelectedParticipantId={setSelectedParticipantId}
+/>
       {active && (
         <AdminMatchesSection
           courtCount={active.courtCount ?? 1}

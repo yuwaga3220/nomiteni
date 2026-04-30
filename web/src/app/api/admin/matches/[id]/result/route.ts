@@ -42,7 +42,7 @@ export async function POST(req: Request, ctx: RouteContext) {
     where: { id },
     data: {
       winnerId: parsed.data.winnerId,
-      status: MatchStatus.COMPLETED,
+      status: MatchStatus.FINISHED,
       courtNumber: null,
     },
   });

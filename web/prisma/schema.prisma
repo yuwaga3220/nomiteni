@@ -19,10 +19,9 @@ enum TournamentStatus {
 }
 
 enum MatchStatus {
-  PENDING
-  ASSIGNED
-  IN_PROGRESS
-  COMPLETED
+  READY
+  RUNNING
+  FINISHED
 }
 
 enum UserRole {
@@ -69,7 +68,7 @@ model Match {
   player1Id    Int?
   player2Id    Int?
   winnerId     Int?
-  status       MatchStatus @default(PENDING)
+  status       MatchStatus @default(READY)
   courtNumber  Int?
   nextMatchId  Int?
   createdAt    DateTime    @default(now())

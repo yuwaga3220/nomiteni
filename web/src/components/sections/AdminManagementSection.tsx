@@ -32,34 +32,44 @@ type AdminManagementProps = {
 
 // 管理者メニューセクション
 export function AdminManagementSection(props: AdminManagementProps) {
+  const isEntry = (props.active?.status ?? "").toUpperCase() === "ENTRY";
+  const isReady = (props.active?.status ?? "").toUpperCase() === "READY";
+  const isRunning = (props.active?.status ?? "").toUpperCase() === "RUNNING";
+  const isFinished = (props.active?.status ?? "").toUpperCase() === "FINISHED";
+
   // 管理者メニューセクションを返す
   return (
     <section className="grid2">
       <div className="card">
         <h2>大会管理</h2>
+        {props.active && (
+          <div className="message">
+            <strong>現在の大会</strong>: {props.active.name} (ID: {props.active.id}) / 状態: {props.active.status}
+          </div>
+        )}
         <div className="row">
           <label>大会状態</label>
           <button
-            className={props.active?.status === "ENTRY" ? "activeStateButton" : "inactiveStateButton"}
             onClick={() => props.onSetTournamentStatus("ENTRY")}
+            disabled={!(isReady)}
           >
             ENTRY
           </button>
           <button
-            className={props.active?.status === "READY" ? "activeStateButton" : "inactiveStateButton"}
             onClick={() => props.onSetTournamentStatus("READY")}
+            disabled={!(isEntry || isFinished)}
           >
             READY
           </button>
           <button
-            className={props.active?.status === "RUNNING" ? "activeStateButton" : "inactiveStateButton"}
             onClick={() => props.onSetTournamentStatus("RUNNING")}
+            disabled={!(isReady)}
           >
             RUNNING
           </button>
           <button
-            className={props.active?.status === "FINISHED" ? "activeStateButton" : "inactiveStateButton"}
             onClick={() => props.onSetTournamentStatus("FINISHED")}
+            disabled={!isRunning}
           >
             FINISHED
           </button>
@@ -92,11 +102,6 @@ export function AdminManagementSection(props: AdminManagementProps) {
         />
         <button onClick={props.onSaveTournamentSettings}>大会設定を保存</button>
         
-        {props.active && (
-          <div className="message">
-            <strong>現在の大会</strong>: {props.active.name} (ID: {props.active.id}) / 状態: {props.active.status}
-          </div>
-        )}
       </div>
       <div className="card">
         <h2>参加者チェックイン（管理者操作）</h2>
@@ -104,18 +109,18 @@ export function AdminManagementSection(props: AdminManagementProps) {
           {(props.state?.users ?? []).map((u) => (
             <div key={u.id} className="listItem">
               <span>{u.name}</span>
-              <button className={props.checkinState(u) === "READY" ? "activeStateButton" : "inactiveStateButton"} onClick={() => props.onSetReady(u.id)}>
+              <button onClick={() => props.onSetReady(u.id)}>
                 チェックイン済
               </button>
-              <button className={props.checkinState(u) === "ABSENT" ? "activeStateButton" : "inactiveStateButton"} onClick={() => props.onSetAbsent(u.id)}>
+
+              <button onClick={() => props.onSetAbsent(u.id)}>
                 不参加（def）
               </button>
-              <button
-                className={props.checkinState(u) === "UNANSWERED" ? "activeStateButton" : "inactiveStateButton"}
-                onClick={() => props.onSetUnanswered(u.id)}
-              >
+
+              <button onClick={() => props.onSetUnanswered(u.id)}>
                 未回答
               </button>
+
             </div>
           ))}
         </div>

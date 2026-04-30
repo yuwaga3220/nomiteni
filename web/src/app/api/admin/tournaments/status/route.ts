@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
+import { TournamentStatus } from "@prisma/client";
 import { requireScopedAdminTournament } from "@/lib/admin-scope";
 import { getPrisma } from "@/lib/prisma";
 import { tournamentStatusSchema } from "@/lib/schemas";
-import { broadcastState } from "@/lib/tournament-service";
+import { recreateTournamentMatches } from "@/lib/tournament-create";
+import { broadcastState, resolveAutomaticMatches } from "@/lib/tournament-service";
 
 // 大会のstatusのstatusを更新
 export async function POST(req: Request) {
@@ -16,10 +18,24 @@ export async function POST(req: Request) {
   }
 
   const prisma = getPrisma();
-  await prisma.tournament.update({
-    where: { id: scoped.tournament.id },
-    data: { status: parsed.data.status },
+  const nextStatus = parsed.data.status;
+
+  await prisma.$transaction(async (tx) => {
+    // RUNNINGの場合はmatchesを再生成
+    if (nextStatus === TournamentStatus.RUNNING) {
+      await recreateTournamentMatches(tx, scoped.tournament.id);
+    }
+
+    await tx.tournament.update({
+      where: { id: scoped.tournament.id },
+      data: { status: nextStatus },
+    });
   });
+  
+  // RUNNINGの場合は自動試合を解決
+  if (nextStatus === TournamentStatus.RUNNING) {
+    await resolveAutomaticMatches(scoped.tournament.id);
+  }
 
   await broadcastState();
   return NextResponse.json({ ok: true });

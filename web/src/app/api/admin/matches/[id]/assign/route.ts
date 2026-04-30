@@ -36,7 +36,7 @@ export async function POST(req: Request, ctx: RouteContext) {
   // 試合をコートに割り当てる
   const match = await prisma.match.update({
     where: { id },
-    data: { courtNumber: parsed.data.courtNumber, status: MatchStatus.ASSIGNED },
+    data: { courtNumber: parsed.data.courtNumber, status: MatchStatus.READY },
   });
   // 試合をブロードキャスト
   await broadcastState();

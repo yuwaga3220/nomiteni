@@ -21,7 +21,7 @@ export async function POST(_req: Request, ctx: RouteContext) {
   }
   const match = await prisma.match.update({
     where: { id },
-    data: { status: MatchStatus.IN_PROGRESS },
+    data: { status: MatchStatus.RUNNING },
   });
   await broadcastState();
   return NextResponse.json({ match });

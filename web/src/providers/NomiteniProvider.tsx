@@ -85,7 +85,7 @@ export function NomiteniProvider({
   }, [activeTournaments, me?.role, sessionTournamentId]);
   // 試合を割り当て可能な試合を取得
   const assignableMatches = (active?.matches ?? []).filter(
-    (m) => m.status !== "COMPLETED" && m.player1Id && m.player2Id,
+    (m) => m.status === "READY" || m.status === "RUNNING",
   );
   // 状態を更新
   const refresh = async () => {
@@ -203,9 +203,8 @@ export function NomiteniProvider({
 
   // 試合状態をラベル化
   const matchStatusLabel = (status: Match["status"]) => {
-    if (status === "PENDING") return "待機"; // 待機状態
-    if (status === "ASSIGNED") return "予備"; // 予備状態
-    if (status === "IN_PROGRESS") return "試合中"; // 試合中状態
+    if (status === "READY") return "準備完了"; // 準備完了
+    if (status === "RUNNING") return "試合中"; // 試合中状態
     return "終了"; // 終了状態
   };
 

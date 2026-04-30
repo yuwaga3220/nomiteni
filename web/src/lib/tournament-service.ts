@@ -5,7 +5,7 @@ import { getPrisma } from "@/lib/prisma";
 import { emitStateUpdate } from "@/lib/socket-registry";
 
 // トーナメントの足の数を計算
-export function nextPowerOfTwo(n: number): number {
+export function getBracketSize(n: number): number {
   let v = 1;
   while (v < n) v *= 2;
   return v;
@@ -86,7 +86,7 @@ export async function getActiveTournamentByObserverPasscode(passcode: string) {
 }
 
 // エントリーパスコードが一致するアクティブなトーナメントをひとつだけ取得（複数ある場合は createdAt が新しい方）
-export async function findActiveTournamentByEntryPasscode(passcode: string) {
+export async function getActiveTournamentByEntryPasscode(passcode: string) {
   const prisma = getPrisma();
   return prisma.tournament.findFirst({
     where: {
@@ -127,23 +127,23 @@ export async function resolveAutomaticMatches(tournamentId: number) {
     });
 
     for (const match of matches) {
-      if (match.status === MatchStatus.COMPLETED) continue;
+      if (match.status === MatchStatus.FINISHED) continue;
       const players = [match.player1Id, match.player2Id].filter(Boolean) as number[];
       const feedersDone =
-        match.round === 1 || match.feeders.every((f) => f.status === MatchStatus.COMPLETED);
+        match.round === 1 || match.feeders.every((f) => f.status === MatchStatus.FINISHED);
       if (!feedersDone) continue;
 
       if (players.length === 0) {
         await prisma.match.update({
           where: { id: match.id },
-          data: { status: MatchStatus.COMPLETED, winnerId: null, courtNumber: null },
+          data: { status: MatchStatus.FINISHED, winnerId: null, courtNumber: null },
         });
         await attachWinnerToNext(match.id);
         changed = true;
       } else if (players.length === 1) {
         await prisma.match.update({
           where: { id: match.id },
-          data: { status: MatchStatus.COMPLETED, winnerId: players[0], courtNumber: null },
+          data: { status: MatchStatus.FINISHED, winnerId: players[0], courtNumber: null },
         });
         await attachWinnerToNext(match.id);
         changed = true;
@@ -160,7 +160,7 @@ export async function updateTournamentStatus(tournamentId: number) {
     orderBy: [{ round: "desc" }, { position: "desc" }],
   });
   if (!finalMatch) return;
-  if (finalMatch.status === MatchStatus.COMPLETED) {
+  if (finalMatch.status === MatchStatus.FINISHED) {
     await prisma.tournament.update({
       where: { id: tournamentId },
       data: { status: TournamentStatus.FINISHED },

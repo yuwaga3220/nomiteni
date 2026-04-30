@@ -22,7 +22,7 @@ export type Match = {
   player1Id: number | null;
   player2Id: number | null;
   winnerId: number | null;
-  status: "PENDING" | "ASSIGNED" | "IN_PROGRESS" | "COMPLETED";
+  status: "READY" | "RUNNING" | "FINISHED";
   courtNumber: number | null;
 };
 

@@ -23,8 +23,8 @@ export function RealtimeSection(props: RealtimeProps) {
     [props.active?.matches, props.groupedRounds],
   );
 
-  const inProgressMatches = useMemo(
-    () => tournamentMatches.filter((m) => m.status === "ASSIGNED" || m.status === "IN_PROGRESS"),
+  const runningMatches = useMemo(
+    () => tournamentMatches.filter((m) => m.status === "RUNNING"),
     [tournamentMatches],
   );
 
@@ -72,8 +72,8 @@ export function RealtimeSection(props: RealtimeProps) {
       <p>コート数： {props.active?.courtCount ?? "-"}</p>
       <h3>進行中の試合</h3>
       <div className="list">
-        {inProgressMatches.length === 0 && <div className="statusText">現在進行中の試合はありません</div>}
-        {inProgressMatches.map((m) => (
+        {runningMatches.length === 0 && <div className="statusText">現在進行中の試合はありません</div>}
+        {runningMatches.map((m) => (
           <div key={m.id} className="listItem">
             <span>
               コート{m.courtNumber}: {props.playerName(m.player1Id)} vs {props.playerName(m.player2Id)}

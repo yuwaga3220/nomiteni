@@ -4,7 +4,7 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { AuthModal, HomeAccessSection } from "@/components/AppSections";
+import { AuthModal, HomeSection } from "@/components/AppSections";
 import { useNomiteni } from "@/context/NomiteniContext";
 import { api } from "@/lib/client/api";
 import { useHomeActions } from "./hooks/useHomeActions";
@@ -85,7 +85,7 @@ export function HomePage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- マウント時のみ
   }, []);
 
-  // AuthModalとHomeAccessSectionを返す
+  // AuthModalとHomeSectionを返す
   return (
     <>
       <AuthModal
@@ -98,7 +98,7 @@ export function HomePage() {
         onLogin={actions.onLogin}
         onSignup={actions.onSignup}
       />
-      <HomeAccessSection // ホームアクセスセクション
+      <HomeSection // ホームセクション
         adminPasscode={adminPasscode}
         setAdminPasscode={setAdminPasscode}
         observerLoginPasscode={observerLoginPasscode}

@@ -94,7 +94,7 @@ export async function createTournamentWithSettings(data: TournamentSettingsInput
       eventDate: data.eventDate ?? null,
       timeSlot: data.timeSlot ?? null,
       courtCount: data.courtCount,
-      status: TournamentStatus.ENTRY,
+      status: TournamentStatus.READY,
       observerPasscode: data.observerPasscode,
     },
   });

@@ -1,13 +1,14 @@
-// web/src/components/sections/AdminManagementSection.tsx
-// 管理者メニューセクション
+// web/src/components/sections/TournamentSettingSection.tsx
+// 大会設定セクション
 "use client";
 
-import type { PublicState, Tournament } from "@/types";
+import { useEffect, useState } from "react";
+import type { PublicState, Tournament, TournamentParticipant } from "@/types";
 
-type TournamentStatus = "ENTRY" | "READY" | "RUNNING" | "FINISHED";
+type TournamentStatus = "READY" | "RUNNING" | "FINISHED";
 
 // 管理者メニューセクションのプロパティ
-type AdminManagementProps = {
+type TournamentSettingProps = {
   active: Tournament | null | undefined;
   state: PublicState | null;
   tournamentName: string;
@@ -20,16 +21,25 @@ type AdminManagementProps = {
   setCourtCountInput: (v: number) => void;
   observerSetPasscode: string;
   setObserverSetPasscode: (v: string) => void;
+  participants: TournamentParticipant[];
   onSaveTournamentSettings: () => void;
   onSetTournamentStatus: (status: TournamentStatus) => void;
+  onCreateParticipant: (name: string) => void;
+  onUpdateParticipant: (id: number, name: string) => void;
+  onDeleteParticipant: (id: number) => void;
 };
 
-// 管理者メニューセクション
-export function AdminManagementSection(props: AdminManagementProps) {
-  const isEntry = (props.active?.status ?? "").toUpperCase() === "ENTRY";
+// 大会設定セクション
+export function TournamentSettingSection(props: TournamentSettingProps) {
+  const [newParticipantName, setNewParticipantName] = useState("");
+  const [participantNames, setParticipantNames] = useState<Record<number, string>>({});
   const isReady = (props.active?.status ?? "").toUpperCase() === "READY";
   const isRunning = (props.active?.status ?? "").toUpperCase() === "RUNNING";
   const isFinished = (props.active?.status ?? "").toUpperCase() === "FINISHED";
+
+  useEffect(() => {
+    setParticipantNames(Object.fromEntries(props.participants.map((participant) => [participant.id, participant.name])));
+  }, [props.participants]);
 
   // 管理者メニューセクションを返す
   return (
@@ -44,14 +54,8 @@ export function AdminManagementSection(props: AdminManagementProps) {
         <div className="row">
           <label>大会状態</label>
           <button
-            onClick={() => props.onSetTournamentStatus("ENTRY")}
-            disabled={!(isReady)}
-          >
-            ENTRY
-          </button>
-          <button
             onClick={() => props.onSetTournamentStatus("READY")}
-            disabled={!(isEntry || isFinished)}
+            disabled={!isFinished}
           >
             READY
           </button>
@@ -89,6 +93,52 @@ export function AdminManagementSection(props: AdminManagementProps) {
         />
         <button onClick={props.onSaveTournamentSettings}>大会設定を保存</button>
         
+      </div>
+      <div className="card">
+        <h2>参加者登録</h2>
+        <div className="row">
+          <input
+            placeholder="参加者名"
+            value={newParticipantName}
+            onChange={(e) => setNewParticipantName(e.target.value)}
+            disabled={!isReady}
+          />
+          <button
+            onClick={() => {
+              props.onCreateParticipant(newParticipantName);
+              setNewParticipantName("");
+            }}
+            disabled={!isReady || !newParticipantName.trim()}
+          >
+            登録
+          </button>
+        </div>
+        <div className="list">
+          {props.participants.map((participant) => (
+            <div key={participant.id} className="listItem">
+              <input
+                value={participantNames[participant.id] ?? participant.name}
+                onChange={(e) =>
+                  setParticipantNames((current) => ({
+                    ...current,
+                    [participant.id]: e.target.value,
+                  }))
+                }
+                disabled={!isReady}
+              />
+              <button
+                onClick={() => props.onUpdateParticipant(participant.id, participantNames[participant.id] ?? participant.name)}
+                disabled={!isReady || !(participantNames[participant.id] ?? participant.name).trim()}
+              >
+                更新
+              </button>
+              <button onClick={() => props.onDeleteParticipant(participant.id)} disabled={!isReady}>
+                削除
+              </button>
+            </div>
+          ))}
+          {props.participants.length === 0 && <div className="statusText">参加者はまだ登録されていません</div>}
+        </div>
       </div>
     </section>
   );

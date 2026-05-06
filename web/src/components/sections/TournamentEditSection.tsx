@@ -3,11 +3,11 @@
 import { TournamentParticipant } from "@/types";
 import { TournamentBracketView, type BracketRoundView } from "./TournamentBracketView";
 
-type AdminTournamentEditProps = {
+type TournamentEditProps = {
   bracketSize: number;
   bracketHeight: number;
   bracketRounds: BracketRoundView[];
-  tournamentStatus?: "ENTRY" | "READY" | "RUNNING" | "FINISHED";
+  tournamentStatus?: "READY" | "RUNNING" | "FINISHED";
   participants: TournamentParticipant[];
   onSwapParticipants: (id1: number | null, id2: number | null) => void;
   selectedParticipantId1: number | null;
@@ -17,7 +17,7 @@ type AdminTournamentEditProps = {
 };
 
 // 管理者トーナメント編集セクションを返す
-export function AdminTournamentEditSection(props: AdminTournamentEditProps) {
+export function TournamentEditSection(props: TournamentEditProps) {
   const canChangeParticipantPosition = props.tournamentStatus === "READY";
   const canSwapParticipants = canChangeParticipantPosition
     && props.selectedParticipantId1 !== null

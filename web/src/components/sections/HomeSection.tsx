@@ -1,13 +1,13 @@
-// web/src/components/sections/HomeAccessSection.tsx
-// ホームアクセスセクション
+// web/src/components/sections/HomeSection.tsx
+// ホームセクション
 // home-page.tsxから呼び出される
 "use client";
 
 import type { Tournament } from "@/types";
 import { CreateTournamentModal } from "@/components/modals/CreateTournamentModal";
 
-// ホームアクセスセクションのプロパティ
-type HomeAccessProps = {
+// ホームセクションのプロパティ
+type HomeProps = {
   adminPasscode: string;
   setAdminPasscode: (v: string) => void;
   observerLoginPasscode: string;
@@ -31,8 +31,8 @@ type HomeAccessProps = {
   activeTournaments: Tournament[];
 };
 
-// ホームアクセスセクションを返す
-export function HomeAccessSection(props: HomeAccessProps) {
+// ホームセクションを返す
+export function HomeSection(props: HomeProps) {
   return (
     <>
       <div className="topCreateTournament">

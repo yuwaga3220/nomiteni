@@ -22,7 +22,7 @@ export type Tournament = {
   timeSlot?: string | null;
   courtCount?: number;
   observerPasscode?: string | null;
-  status: "ENTRY" | "READY" | "RUNNING" | "FINISHED";
+  status: "READY" | "RUNNING" | "FINISHED";
   matches: Match[];
 };
 export type TournamentParticipant = {

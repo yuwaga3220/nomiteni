@@ -11,7 +11,7 @@ type UseAdminTournamentSettingsActionsParams = {
   observerSetPasscode: string;
 };
 
-type TournamentStatus = "ENTRY" | "READY" | "RUNNING" | "FINISHED";
+type TournamentStatus = "READY" | "RUNNING" | "FINISHED";
 
 // 大会設定を保存する
 export function useAdminTournamentSettingsActions(params: UseAdminTournamentSettingsActionsParams) {

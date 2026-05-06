@@ -68,6 +68,7 @@ export function ObserveSection(props: ObserveProps) {
   return (
     <section className="card">
       <h2>トーナメント進行状態</h2>
+      <p>現在の大会の進行状態をリアルタイムに表示します。このセクションは誰でも閲覧できます。</p>
       <p>大会： {props.active ? `${props.active.name} (${props.active.status})` : "未作成"}</p>
       <p>コート数： {props.active?.courtCount ?? "-"}</p>
       <h3>進行中の試合</h3>

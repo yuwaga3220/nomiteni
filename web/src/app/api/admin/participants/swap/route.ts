@@ -5,10 +5,14 @@ import { z } from "zod";
 import { getPrisma } from "@/lib/prisma";
 import { requireScopedAdminTournament } from "@/lib/admin-scope";
 import { broadcastState } from "@/lib/tournament-service";
+import { recreateTournamentMatches } from "@/lib/tournament-create";
 export async function POST(req: Request) {
 
     const scoped = await requireScopedAdminTournament();
     if ("error" in scoped) return scoped.error;
+    if (scoped.tournament.status !== "READY") {
+        return NextResponse.json({ error: "参加者の変更はREADY状態でのみ行えます。" }, { status: 400 });
+    }
 
     const body: unknown = await req.json();
     const parsed = z
@@ -56,6 +60,7 @@ export async function POST(req: Request) {
             where: { id: parsed.data.id1 },
             data: { initialPosition: initialPosition2 },
         });
+        await recreateTournamentMatches(tx, scoped.tournament.id);
         return [updated1, updated2];
     });
 

@@ -30,5 +30,5 @@ export const tournamentSettingsSchema = z.object({
 });
 
 export const tournamentStatusSchema = z.object({
-  status: z.enum(["ENTRY", "READY", "RUNNING", "FINISHED"]),
+  status: z.enum(["READY", "RUNNING", "FINISHED"]),
 });

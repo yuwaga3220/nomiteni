@@ -4,7 +4,7 @@
 
 import { useLayoutEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { AdminManagementSection, AdminTournamentEditSection, AdminMatchesSection, ObserveSection } from "@/components/AppSections";
+import { TournamentSettingSection, TournamentEditSection, TournamentManagementSection, ObserveSection } from "@/components/AppSections";
 import { useNomiteni } from "@/context/NomiteniContext";
 import { useAdminActions } from "./hooks/useAdminActions";
 
@@ -67,7 +67,7 @@ export function AdminPage() {
         <br />
         <button onClick={() => router.push("/")}>ホームに戻る</button>
       </section>
-      <AdminManagementSection
+      <TournamentSettingSection
         active={active}
         state={state}
         tournamentName={tournamentName}
@@ -80,10 +80,14 @@ export function AdminPage() {
         setCourtCountInput={setCourtCountInput}
         observerSetPasscode={observerSetPasscode}
         setObserverSetPasscode={setObserverSetPasscode}
+        participants={tournamentParticipants}
         onSaveTournamentSettings={actions.onSaveTournamentSettings}
         onSetTournamentStatus={actions.onSetTournamentStatus}
+        onCreateParticipant={actions.onCreateParticipant}
+        onUpdateParticipant={actions.onUpdateParticipant}
+        onDeleteParticipant={actions.onDeleteParticipant}
       />
-      <AdminTournamentEditSection
+      <TournamentEditSection
         bracketSize={actions.bracketSize}
         bracketHeight={actions.bracketHeight}
         bracketRounds={actions.bracketRounds}
@@ -96,7 +100,7 @@ export function AdminPage() {
         onSwapParticipants={actions.onSwapParticipants}
 />
       {active && (
-        <AdminMatchesSection
+        <TournamentManagementSection
           courtCount={active.courtCount ?? 1}
           matches={assignableMatches}
           playerName={playerName}

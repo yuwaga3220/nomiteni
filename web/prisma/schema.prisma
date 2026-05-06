@@ -12,7 +12,6 @@ datasource db {
 }
 
 enum TournamentStatus {
-  ENTRY
   READY
   RUNNING
   FINISHED
@@ -37,7 +36,7 @@ model Tournament {
   eventDate        String?
   timeSlot         String?
   courtCount       Int                  @default(2)
-  status           TournamentStatus     @default(ENTRY)
+  status           TournamentStatus     @default(READY)
   observerPasscode String?
   matches          Match[]
   participants     Participant[]

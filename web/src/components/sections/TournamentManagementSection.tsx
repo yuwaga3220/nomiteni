@@ -1,11 +1,11 @@
-// web/src/components/sections/AdminMatchesSection.tsx
-// 管理者試合運営セクション
+// web/src/components/sections/TournamentManagementSection.tsx
+// 大会運営セクション
 "use client";
 
 import type { Match } from "@/types";
 
 // 試合運営セクションのプロパティ
-type AdminMatchesProps = {
+type TournamentManagementProps = {
   courtCount: number;
   matches: Match[];
   playerName: (id: number | null) => string; // IDからプレイヤー名を取得
@@ -14,8 +14,8 @@ type AdminMatchesProps = {
   onWin: (matchId: number, winnerId: number | null) => void; // 試合を勝者にする処理
 };
 
-// 試合運営セクションを返す
-export function AdminMatchesSection(props: AdminMatchesProps) {
+// 大会運営セクションを返す
+export function TournamentManagementSection(props: TournamentManagementProps) {
   const readyMatches = props.matches.filter((m) => m.status === "READY");
   const runningMatches = props.matches.filter((m) => m.status === "RUNNING");
 

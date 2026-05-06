@@ -5,8 +5,8 @@
 
 export { HeaderAuthButtons } from "./sections/HeaderAuthButtons";
 export { AuthModal } from "./modals/AuthModal";
-export { HomeAccessSection } from "./sections/HomeAccessSection";
-export { AdminManagementSection } from "./sections/AdminManagementSection";
-export { AdminTournamentEditSection } from "./sections/AdminTournamentEditSection";
-export { AdminMatchesSection } from "./sections/AdminMatchesSection";
+export { HomeSection } from "./sections/HomeSection";
+export { TournamentSettingSection } from "./sections/TournamentSettingSection";
+export { TournamentEditSection } from "./sections/TournamentEditSection";
+export { TournamentManagementSection } from "./sections/TournamentManagementSection";
 export { ObserveSection } from "./sections/ObserveSection";

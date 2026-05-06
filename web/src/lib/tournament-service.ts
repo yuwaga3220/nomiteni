@@ -28,7 +28,6 @@ export async function buildPublicState() {
     where: {
       status: {
         in: [
-          TournamentStatus.ENTRY,
           TournamentStatus.READY,
           TournamentStatus.RUNNING,
           TournamentStatus.FINISHED,

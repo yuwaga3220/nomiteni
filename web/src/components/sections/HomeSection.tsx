@@ -47,7 +47,7 @@ export function HomeSection(props: HomeProps) {
             onChange={(e) => props.setAdminPasscode(e.target.value)}
           />
           <button className="homeSectionButton roleAdminButton" onClick={props.onAdminLogin}>
-            管理画面へ
+            管理者ページへ
           </button>
         </div>
 
@@ -84,7 +84,7 @@ export function HomeSection(props: HomeProps) {
             onChange={(e) => props.setObserverLoginPasscode(e.target.value)}
           />
           <button className="homeSectionButton roleObserverButton" onClick={props.onObserverLogin}>
-            観戦画面へ
+            観戦ページへ
           </button>
         </div>
 

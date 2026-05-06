@@ -14,22 +14,31 @@ export function AppShell({ children }: { children: ReactNode }) {
   const { me, isLoggedIn, authEmail, onHeaderLogout, setAuthModalState, message } = useNomiteni();
 
   return (
-    <main className="container">
-      <header className="appHeader">
-        <h1>
-          <Link href="/" className="appTitleLink">
-            テニサー大会運営サービス Nomiteni
-          </Link>
-        </h1>
-        <HeaderAuthButtons
-          setAuthModalState={setAuthModalState} // 認証モードを設定
-          isLoggedIn={isLoggedIn} // ログイン状態
-          loginEmail={me?.email ?? authEmail} // ログインメールアドレス
-          onLogoutClick={onHeaderLogout} // ログアウトクリック
-        />
-      </header>
-      {message && <p className="message">{message}</p>}
-      {children}
-    </main>
+    <div className="appShell">
+      <main className="container appMain">
+        <header className="appHeader">
+          <h1>
+            <Link href="/" className="appTitleLink">
+              ノミテニ
+            </Link>
+          </h1>
+          <HeaderAuthButtons
+            setAuthModalState={setAuthModalState} // 認証モードを設定
+            isLoggedIn={isLoggedIn} // ログイン状態
+            loginEmail={me?.email ?? authEmail} // ログインメールアドレス
+            onLogoutClick={onHeaderLogout} // ログアウトクリック
+          />
+        </header>
+        {message && <p className="message">{message}</p>}
+        {children}
+      </main>
+      <footer className="appFooter">
+        <p className="appFooterText">Developed at Picnic Tennis Court</p>
+        <div className="appFooterActions">
+          <button type="button">Usage</button>
+          <button type="button">Contact</button>
+        </div>
+      </footer>
+    </div>
   );
 }

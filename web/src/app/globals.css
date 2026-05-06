@@ -13,10 +13,58 @@ body {
   margin: 0;
 }
 
+.appShell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.appMain {
+  flex: 1 0 auto;
+  width: 100%;
+}
+
+.appFooter {
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  margin-top: 16px;
+  padding: 12px 20px;
+  border-top: 1px solid #d7e7c6;
+  background: #f5faef;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.appFooterText {
+  margin: 0;
+  color: #3f523f;
+}
+
+.appFooterActions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.appFooterActions button {
+  background: transparent;
+  color: #3f523f;
+  border: none;
+  padding: 0;
+  border-radius: 0;
+  line-height: 1.2;
+  font-size: 14px;
+  cursor: default;
+}
+
 .container {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  width: min(1200px, 100%);
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px 20px;
@@ -29,9 +77,9 @@ body {
   margin-top: 0;
   margin-bottom: 8px;
   padding: 14px 20px;
-  background: #b8dd95;
-  color: #243224;
-  border-bottom: 1px solid #8eb86c;
+  background: #f5faef;
+  color: #3f523f;
+  border-bottom: 1px solid #d7e7c6;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -42,7 +90,7 @@ body {
   margin: 0;
   font-size: 24px;
   font-weight: 700;
-  color: #243224;
+  color: #3f523f;
 }
 
 .appTitleLink {
@@ -58,6 +106,13 @@ body {
   display: flex;
   gap: 8px;
   align-items: center;
+}
+
+.headerActions button {
+  background: #e7efe0;
+  color: #3f523f;
+  border: 1px solid #c8d9ba;
+  box-shadow: none;
 }
 
 .headerActions span {
@@ -192,6 +247,21 @@ button:disabled {
 button:disabled:hover,
 button:disabled:active {
   background: #4d73b9;
+  transform: none;
+}
+
+.headerActions button:hover {
+  background: #dfe9d5;
+}
+
+.headerActions button:active {
+  background: #d4e1c8;
+  transform: translateY(1px);
+}
+
+.appFooterActions button:hover,
+.appFooterActions button:active {
+  background: transparent;
   transform: none;
 }
 
@@ -491,5 +561,10 @@ button:disabled:active {
 @media (max-width: 900px) {
   .grid2 {
     grid-template-columns: 1fr;
+  }
+
+  .appFooter {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }

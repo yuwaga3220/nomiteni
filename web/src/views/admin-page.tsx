@@ -68,10 +68,8 @@ export function AdminPage() {
   // 管理者ページを返す
   return (
     <>
-      <section className="card">
-        <h2>管理者メニュー</h2>
-        <br />
-        <button onClick={() => router.push("/")}>ホームに戻る</button>
+      <section className="adminMenuSection">
+        <h1>管理者メニュー</h1>
       </section>
       <TournamentStatusSection
         active={active}
@@ -115,6 +113,7 @@ export function AdminPage() {
           playerName={playerName}
           onAssignCourt={actions.onAssignCourt}
           onStart={actions.onStart}
+          onBackToReady={actions.onBackToReady}
           onWin={actions.onWin}
         />
       )}

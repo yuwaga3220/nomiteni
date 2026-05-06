@@ -55,7 +55,9 @@ export function TournamentSettingSection(props: TournamentSettingProps) {
           value={props.observerSetPasscode}
           onChange={(e) => props.setObserverSetPasscode(e.target.value)}
         />
-        <button onClick={props.onSaveTournamentSettings}>大会設定を保存</button>
+        <button className="saveTournamentSettingsButton" onClick={props.onSaveTournamentSettings}>
+          大会設定を保存
+        </button>
         
       </div>
       <RegisterParticipantsSection

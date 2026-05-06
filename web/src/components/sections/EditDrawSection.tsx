@@ -25,7 +25,7 @@ export function EditDrawSection(props: EditDrawProps) {
     && props.selectedParticipantId1 !== props.selectedParticipantId2;
   return (
     <section className="card">
-      <h2>トーナメント編集</h2>
+      <h2>ドロー編集</h2>
       <p>開始前の大会のドローを変更することができます。</p>
       <select
         value={props.selectedParticipantId1 ?? ""}

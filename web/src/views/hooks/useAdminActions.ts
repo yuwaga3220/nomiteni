@@ -51,6 +51,7 @@ export function useAdminActions(params: UseAdminActionsParams) {
     onDeleteParticipant: participantActions.onDeleteParticipant,
     onAssignCourt: matchActions.onAssignCourt,
     onStart: matchActions.onStart,
+    onBackToReady: matchActions.onBackToReady,
     onWin: matchActions.onWin,
     onSwapParticipants: participantActions.onSwapParticipants,
   };

@@ -8,6 +8,7 @@ type UseHomeAccessActionsParams = {
   router: AppRouterInstance;
   setMe: (me: Me | null) => void;
   setAuthModalState: (mode: AuthMode) => void;
+  isLoggedIn: boolean;
   isLoginReady: boolean;
   setMessage: (message: string) => void;
   setForceLoginCardsView: (value: boolean) => void;
@@ -39,13 +40,15 @@ export function useHomeAccessActions(params: UseHomeAccessActionsParams) {
   };
 
   const onAdminLogin = () => {
-    if (!params.isLoginReady) {
+    if (!params.isLoggedIn && !params.isLoginReady) {
       openLoginModalWithMessage();
       return;
     }
     (async () => {
       try {
-        params.ensureLoginCredentials();
+        if (!params.isLoggedIn) {
+          params.ensureLoginCredentials();
+        }
         const result = await api<{ user: Me; tournamentId: number }>("/api/auth/admin", {
           method: "POST",
           body: JSON.stringify({ passcode: params.adminPasscode }),

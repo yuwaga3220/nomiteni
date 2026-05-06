@@ -1,5 +1,5 @@
-// web/src/app/api/admin/matches/[id]/start/route.ts
-// 試合を開始する
+// web/src/app/api/admin/matches/[id]/ready/route.ts
+// 試合を準備中へ戻す
 import { MatchStatus } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { requireScopedAdminTournament } from "@/lib/admin-scope";
@@ -19,15 +19,13 @@ export async function POST(_req: Request, ctx: RouteContext) {
   if (!current || current.tournamentId !== scoped.tournament.id) {
     return NextResponse.json({ error: "試合が見つかりません。" }, { status: 404 });
   }
-  if (!current.player1Id || !current.player2Id) {
-    return NextResponse.json({ error: "対戦者が揃っていません。" }, { status: 400 });
+  if (current.status !== MatchStatus.RUNNING) {
+    return NextResponse.json({ error: "進行中の試合のみ準備中へ戻せます。" }, { status: 400 });
   }
-  if (!current.courtNumber) {
-    return NextResponse.json({ error: "コートを選択してください。" }, { status: 400 });
-  }
+
   const match = await prisma.match.update({
     where: { id },
-    data: { status: MatchStatus.RUNNING },
+    data: { status: MatchStatus.READY, courtNumber: current.courtNumber ?? null },
   });
   await broadcastState();
   return NextResponse.json({ match });

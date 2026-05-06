@@ -10,6 +10,7 @@ type UseHomeActionsParams = {
   router: AppRouterInstance;
   setMe: (me: Me | null) => void;
   setAuthModalState: (mode: AuthMode) => void;
+  isLoggedIn: boolean;
   isLoginReady: boolean;
   setMessage: (message: string) => void;
   setForceLoginCardsView: (value: boolean) => void;
@@ -40,6 +41,7 @@ export function useHomeActions(params: UseHomeActionsParams) {
     router: params.router,
     setMe: params.setMe,
     setAuthModalState: params.setAuthModalState,
+    isLoggedIn: params.isLoggedIn,
     isLoginReady: params.isLoginReady,
     setMessage: params.setMessage,
     setForceLoginCardsView: params.setForceLoginCardsView,

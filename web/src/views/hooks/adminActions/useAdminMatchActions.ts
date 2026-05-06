@@ -25,6 +25,14 @@ export function useAdminMatchActions(params: UseAdminMatchActionsParams) {
       }),
     );
 
+  // 進行中の試合を準備中へ戻す
+  const onBackToReady = (matchId: number) =>
+    params.call(() =>
+      api(`/api/admin/matches/${matchId}/ready`, {
+        method: "POST",
+      }),
+    );
+
   // 試合を勝者にする
   const onWin = (matchId: number, winnerId: number | null) =>
     params.call(() =>
@@ -37,6 +45,7 @@ export function useAdminMatchActions(params: UseAdminMatchActionsParams) {
   return {
     onAssignCourt,
     onStart,
+    onBackToReady,
     onWin,
   };
 }

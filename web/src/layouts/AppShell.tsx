@@ -4,6 +4,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import Link from "next/link";
 import { HeaderAuthButtons } from "@/components/AppSections";
 import { useNomiteni } from "@/context/NomiteniContext";
 
@@ -15,7 +16,11 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     <main className="container">
       <header className="appHeader">
-        <h1>テニサー大会運営サービス Nomiteni</h1>
+        <h1>
+          <Link href="/" className="appTitleLink">
+            テニサー大会運営サービス Nomiteni
+          </Link>
+        </h1>
         <HeaderAuthButtons
           setAuthModalState={setAuthModalState} // 認証モードを設定
           isLoggedIn={isLoggedIn} // ログイン状態

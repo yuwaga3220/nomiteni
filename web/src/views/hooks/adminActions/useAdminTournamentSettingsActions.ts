@@ -8,7 +8,6 @@ type UseAdminTournamentSettingsActionsParams = {
   tournamentDate: string;
   tournamentTimeSlot: string;
   courtCountInput: number;
-  entrySetPasscode: string;
   observerSetPasscode: string;
 };
 
@@ -25,7 +24,6 @@ export function useAdminTournamentSettingsActions(params: UseAdminTournamentSett
           eventDate: params.tournamentDate || null,
           timeSlot: params.tournamentTimeSlot || null,
           courtCount: params.courtCountInput,
-          entryPasscode: params.entrySetPasscode,
           observerPasscode: params.observerSetPasscode,
         }),
       }),

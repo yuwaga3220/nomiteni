@@ -11,8 +11,6 @@ type CreateTournamentModalProps = {
   setCreateTournamentTimeSlot: (v: string) => void;
   createTournamentCourtCount: number;
   setCreateTournamentCourtCount: (v: number) => void;
-  createTournamentEntryPasscode: string;
-  setCreateTournamentEntryPasscode: (v: string) => void;
   createTournamentObserverPasscode: string;
   setCreateTournamentObserverPasscode: (v: string) => void;
   onCreateTournament: () => void;
@@ -38,12 +36,6 @@ export function CreateTournamentModal(props: CreateTournamentModalProps) {
           placeholder="コート数"
           value={props.createTournamentCourtCount}
           onChange={(e) => props.setCreateTournamentCourtCount(Number(e.target.value))}
-        />
-        <input
-          type="password"
-          placeholder="大会パスコード"
-          value={props.createTournamentEntryPasscode}
-          onChange={(e) => props.setCreateTournamentEntryPasscode(e.target.value)}
         />
         <input
           type="password"

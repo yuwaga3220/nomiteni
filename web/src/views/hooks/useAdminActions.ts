@@ -12,7 +12,6 @@ type UseAdminActionsParams = {
   tournamentDate: string;
   tournamentTimeSlot: string;
   courtCountInput: number;
-  entrySetPasscode: string;
   observerSetPasscode: string;
   tournamentParticipants: TournamentParticipant[];
 };
@@ -30,7 +29,6 @@ export function useAdminActions(params: UseAdminActionsParams) {
     tournamentDate: params.tournamentDate,
     tournamentTimeSlot: params.tournamentTimeSlot,
     courtCountInput: params.courtCountInput,
-    entrySetPasscode: params.entrySetPasscode,
     observerSetPasscode: params.observerSetPasscode,
   });
 
@@ -48,9 +46,6 @@ export function useAdminActions(params: UseAdminActionsParams) {
     bracketHeight: bracketPreview.bracketHeight,
     onSaveTournamentSettings: tournamentSettingsActions.onSaveTournamentSettings,
     onSetTournamentStatus: tournamentSettingsActions.onSetTournamentStatus,
-    onSetReady: participantActions.onSetReady,
-    onSetAbsent: participantActions.onSetAbsent,
-    onSetUnanswered: participantActions.onSetUnanswered,
     onAssignCourt: matchActions.onAssignCourt,
     onStart: matchActions.onStart,
     onWin: matchActions.onWin,

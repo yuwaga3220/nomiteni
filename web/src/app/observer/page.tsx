@@ -1,7 +1,7 @@
 import { ObserverPage } from "@/views/observer-page";
 
-// 観戦者ページ
+// 観戦ページ
 export default function Page() {
-  // 観戦者ページを返す
+  // 観戦ページを返す
   return <ObserverPage />;
 }

@@ -9,12 +9,8 @@ export { HttpError } from "@/lib/http-error";
 export { getPrisma } from "@/lib/prisma";
 export { jsonFromError } from "@/lib/route-utils";
 export {
-  entryPasscodeOnlySchema,
-  entryPasscodeSchema,
-  entrySchema,
   loginSchema,
   observerPasscodeSchema,
-  selfCheckinSchema,
   signupSchema,
   tournamentSettingsSchema,
 } from "@/lib/schemas";
@@ -27,7 +23,6 @@ export {
   attachWinnerToNext,
   broadcastState,
   buildPublicState,
-  getActiveTournamentByEntryPasscode,
   getBracketSize,
   resolveAutomaticMatches,
   shuffle,

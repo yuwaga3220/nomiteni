@@ -8,12 +8,13 @@
 import { useEffect, useLayoutEffect, useMemo, useState, type ReactNode } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { api, getSocket } from "@/lib/client/api";
-import type { AuthMode, CheckinState, Match, Me, PublicState, TournamentBrief, TournamentParticipant, User } from "@/types";
+import type { AuthMode, Match, Me, PublicState, TournamentParticipant } from "@/types";
 import { NomiteniContext, type NomiteniContextValue } from "@/context/NomiteniContext";
 
 export type NomiteniBootstrapData = {
   user: Me | null;
   isLoggedIn: boolean;
+  isAdminSession: boolean;
   state: PublicState;
   sessionTournamentId: number | null;
 };
@@ -40,12 +41,6 @@ export function NomiteniProvider({
   const [authModalState, setAuthModalState] = useState<AuthMode>("none");
   const [authEmail, setAuthEmail] = useState("");
   const [authPassword, setAuthPassword] = useState("");
-  const [entryPasscode, setEntryPasscode] = useState("");
-  const [entryTournament, setEntryTournament] = useState<TournamentBrief | null>(null);
-  const [entryName, setEntryName] = useState("");
-  const [entryParty, setEntryParty] = useState(false);
-  const [entryNote, setEntryNote] = useState("");
-
   const [adminPasscode, setAdminPasscode] = useState("");
   const [observerLoginPasscode, setObserverLoginPasscode] = useState("");
   const [createModalOpen, setCreateModalOpen] = useState(false);
@@ -53,10 +48,8 @@ export function NomiteniProvider({
   const [createTournamentDate, setCreateTournamentDate] = useState("");
   const [createTournamentTimeSlot, setCreateTournamentTimeSlot] = useState("");
   const [createTournamentCourtCount, setCreateTournamentCourtCount] = useState(2);
-  const [createTournamentEntryPasscode, setCreateTournamentEntryPasscode] = useState("");
   const [createTournamentObserverPasscode, setCreateTournamentObserverPasscode] = useState("");
   const [observerSetPasscode, setObserverSetPasscode] = useState("");
-  const [entrySetPasscode, setEntrySetPasscode] = useState("");
   const [tournamentParticipants, setTournamentParticipants] = useState<TournamentParticipant[]>([]);
   const [tournamentName, setTournamentName] = useState("春シングルス大会");
   const [tournamentDate, setTournamentDate] = useState("");
@@ -64,17 +57,18 @@ export function NomiteniProvider({
   const [courtCountInput, setCourtCountInput] = useState(2);
 
   const [isLoggedIn, setIsLoggedIn] = useState(initialData.isLoggedIn);
+  const [isAdminSession, setIsAdminSession] = useState(initialData.isAdminSession);
   const [sessionTournamentId, setSessionTournamentId] = useState<number | null>(initialData.sessionTournamentId);
   const isLoginReady = Boolean(authEmail && authPassword);
 
   // ユーザーIDからユーザー情報を取得
-  const usersById = useMemo(
-    () => new Map((state?.users ?? []).map((u) => [u.id, u])),
-    [state?.users],
+  const participantsById = useMemo(
+    () => new Map((state?.participants ?? []).map((participant) => [participant.id, participant])),
+    [state?.participants],
   );
-  const activeTournaments = state?.activeTournaments ?? [];
+  const activeTournaments = useMemo(() => state?.activeTournaments ?? [], [state?.activeTournaments]);
   const active = useMemo(() => {
-    if ((me?.role === "ADMIN" || me?.role === "OBSERVER") && sessionTournamentId) {
+    if (sessionTournamentId) {
       return (
         activeTournaments.find((tournament) => tournament.id === sessionTournamentId)
         ?? activeTournaments[0]
@@ -82,7 +76,7 @@ export function NomiteniProvider({
       );
     }
     return activeTournaments[0] ?? null;
-  }, [activeTournaments, me?.role, sessionTournamentId]);
+  }, [activeTournaments, sessionTournamentId]);
   // 試合を割り当て可能な試合を取得
   const assignableMatches = (active?.matches ?? []).filter(
     (m) => m.status === "READY" || m.status === "RUNNING",
@@ -97,9 +91,16 @@ export function NomiteniProvider({
   useEffect(() => {
     setMe(initialData.user);
     setIsLoggedIn(initialData.isLoggedIn);
+    setIsAdminSession(initialData.isAdminSession);
     setState(initialData.state);
     setSessionTournamentId(initialData.sessionTournamentId);
-  }, [initialData.user, initialData.isLoggedIn, initialData.state, initialData.sessionTournamentId]);
+  }, [
+    initialData.user,
+    initialData.isLoggedIn,
+    initialData.isAdminSession,
+    initialData.state,
+    initialData.sessionTournamentId,
+  ]);
 
   // マウント時に接続を確立し、アンマウント時に接続を解除
   useEffect(() => {
@@ -126,14 +127,6 @@ export function NomiteniProvider({
   }, []); // マウント時に一度だけ実行
 
   // 参加者の情報を現在の値で更新
-  useEffect(() => {
-    if (me?.role === "PARTICIPANT") { // 参加者の場合
-      setEntryName(me.name ?? "");
-      setEntryParty(me.partyJoin);
-      setEntryNote(me.note ?? "");
-    }
-  }, [me]); // ユーザー情報が変化したら
-
   // 大会情報を更新
   useEffect(() => {
     setTournamentName(active?.name ?? "春シングルス大会");
@@ -144,14 +137,13 @@ export function NomiteniProvider({
 
   // 管理者の情報を現在の値で更新
   useEffect(() => {
-    if (me?.role !== "ADMIN") return;
+    if (!isAdminSession) return;
     api<{
       tournament: {
         name: string;
         eventDate: string | null;
         timeSlot: string | null;
         courtCount: number;
-        entryPasscode: string | null;
         observerPasscode: string | null;
       };
       participants: TournamentParticipant[];
@@ -161,18 +153,16 @@ export function NomiteniProvider({
         setTournamentDate(tournament.eventDate ?? "");
         setTournamentTimeSlot(tournament.timeSlot ?? "");
         setCourtCountInput(tournament.courtCount);
-        setEntrySetPasscode(tournament.entryPasscode ?? "");
         setObserverSetPasscode(tournament.observerPasscode ?? "");
         setTournamentParticipants(participants);
       })
       .catch(() => undefined);
-  }, [me?.role]); // ユーザー情報が変化したら
+  }, [isAdminSession]); // 管理者セッションが変化したら
 
-  // ロールに応じた許可パスへ誘導（ADMIN/OBSERVER はホーム / も利用可）
+  // セッション状態に応じた許可パスへ誘導（管理者はホーム / も利用可）
   useLayoutEffect(() => {
     if (!me) {
-      // /me 取得前は /participant に留め、取得後にロールで振り分ける
-      if (pathname === "/participant" && !forceLoginCardsView) return;
+      if (pathname === "/observer" && sessionTournamentId && !forceLoginCardsView) return;
       if (pathname !== "/") router.replace("/");
       return;
     }
@@ -180,25 +170,17 @@ export function NomiteniProvider({
       if (pathname !== "/") router.replace("/");
       return;
     }
-    if (me.role === "ADMIN") {
+    if (isAdminSession) {
       if (pathname !== "/" && pathname !== "/admin") router.replace("/");
       return;
     }
-    if (me.role === "OBSERVER") {
-      if (pathname !== "/" && pathname !== "/observer") router.replace("/");
-      return;
-    }
-    if (me.role === "LOGIN") {
-      if (pathname !== "/") router.replace("/");
-      return;
-    }
-    if (pathname !== "/" && pathname !== "/participant") router.replace("/");
-  }, [me, forceLoginCardsView, pathname, router]);
+    if (pathname !== "/") router.replace("/");
+  }, [me, forceLoginCardsView, pathname, router, sessionTournamentId, isAdminSession]);
 
   // プレイヤー名を取得
   const playerName = (id: number | null) => {
     if (!id) return "BYE"; // プレイヤーIDがない場合
-    return usersById.get(id)?.name ?? `Player #${id}`; // プレイヤー名を取得
+    return participantsById.get(id)?.name ?? `Player #${id}`; // プレイヤー名を取得
   };
 
   // 試合状態をラベル化
@@ -206,12 +188,6 @@ export function NomiteniProvider({
     if (status === "READY") return "準備完了"; // 準備完了
     if (status === "RUNNING") return "試合中"; // 試合中状態
     return "終了"; // 終了状態
-  };
-
-  // 参加者のチェックイン状態を取得
-  const checkinState = (u: User): CheckinState => {
-    if (!u.checkedIn || u.canPlayToday === null) return "UNANSWERED";
-    return u.canPlayToday ? "READY" : "ABSENT";
   };
 
   // 非同期関数を呼び出し、更新してメッセージを表示
@@ -246,7 +222,6 @@ export function NomiteniProvider({
     setAuthModalState("none");
     setAuthEmail("");
     setAuthPassword("");
-    setEntryTournament(null);
     setCreateModalOpen(false);
     setForceLoginCardsView(false);
     if (me || isLoggedIn) {
@@ -271,16 +246,6 @@ export function NomiteniProvider({
     setAuthEmail,
     authPassword,
     setAuthPassword,
-    entryPasscode,
-    setEntryPasscode,
-    entryTournament,
-    setEntryTournament,
-    entryName,
-    setEntryName,
-    entryParty,
-    setEntryParty,
-    entryNote,
-    setEntryNote,
     adminPasscode,
     setAdminPasscode,
     observerLoginPasscode,
@@ -295,14 +260,10 @@ export function NomiteniProvider({
     setCreateTournamentTimeSlot,
     createTournamentCourtCount,
     setCreateTournamentCourtCount,
-    createTournamentEntryPasscode,
-    setCreateTournamentEntryPasscode,
     createTournamentObserverPasscode,
     setCreateTournamentObserverPasscode,
     observerSetPasscode,
     setObserverSetPasscode,
-    entrySetPasscode,
-    setEntrySetPasscode,
     tournamentName,
     setTournamentName,
     tournamentDate,
@@ -312,6 +273,8 @@ export function NomiteniProvider({
     courtCountInput,
     setCourtCountInput,
     isLoggedIn,
+    isAdminSession,
+    sessionTournamentId,
     isLoginReady,
     activeTournaments,
     active,
@@ -319,7 +282,6 @@ export function NomiteniProvider({
     refresh,
     playerName,
     matchStatusLabel,
-    checkinState,
     call,
     ensureLoginCredentials,
     groupedRounds,

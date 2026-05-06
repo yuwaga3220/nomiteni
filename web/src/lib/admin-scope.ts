@@ -8,7 +8,7 @@ import { getSession } from "@/lib/session-cookie"; // セッションを取得
 // 管理者 API の権限検証
 export async function requireScopedAdminTournament() {
   const session = await getSession();
-  if (!session) {
+  if (!session?.userId) {
     return { error: NextResponse.json({ error: "ログインが必要です。" }, { status: 401 }) };
   }
   if (session.scope !== "admin") {
@@ -26,18 +26,6 @@ export async function requireScopedAdminTournament() {
   const tournament = await prisma.tournament.findUnique({ where: { id: session.tournamentId } });
   if (!tournament) {
     return { error: NextResponse.json({ error: "該当する大会が見つかりません。" }, { status: 404 }) };
-  }
-  const admin = await prisma.userTournamentRole.findUnique({
-    where: {
-      tournamentId_userId_role: {
-        tournamentId: session.tournamentId,
-        userId: session.userId,
-        role: "ADMIN",
-      },
-    },
-  });
-  if (!admin) {
-    return { error: NextResponse.json({ error: "管理者権限がありません。" }, { status: 403 }) };
   }
   // セッションと大会を返す
   return { session, tournament };

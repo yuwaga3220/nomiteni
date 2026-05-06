@@ -22,14 +22,6 @@ export function HomePage() {
     setAuthEmail,
     authPassword,
     setAuthPassword,
-    entryPasscode,
-    setEntryPasscode,
-    entryName,
-    setEntryName,
-    entryParty,
-    setEntryParty,
-    entryNote,
-    setEntryNote,
     adminPasscode,
     setAdminPasscode,
     observerLoginPasscode,
@@ -44,14 +36,11 @@ export function HomePage() {
     setCreateTournamentTimeSlot,
     createTournamentCourtCount,
     setCreateTournamentCourtCount,
-    createTournamentEntryPasscode,
-    setCreateTournamentEntryPasscode,
     createTournamentObserverPasscode,
     setCreateTournamentObserverPasscode,
     activeTournaments,
     isLoginReady,
     setMessage,
-    setEntryTournament,
     setForceLoginCardsView,
     call,
     ensureLoginCredentials,
@@ -64,23 +53,16 @@ export function HomePage() {
     setAuthModalState,
     isLoginReady,
     setMessage,
-    setEntryTournament,
     setForceLoginCardsView,
     call,
     ensureLoginCredentials,
     refresh,
-    entryPasscode,
-    setEntryPasscode,
-    entryName,
-    entryParty,
-    entryNote,
     observerLoginPasscode,
     adminPasscode,
     createTournamentName,
     createTournamentDate,
     createTournamentTimeSlot,
     createTournamentCourtCount,
-    createTournamentEntryPasscode,
     createTournamentObserverPasscode,
     authEmail,
     authPassword,
@@ -117,27 +99,11 @@ export function HomePage() {
         onSignup={actions.onSignup}
       />
       <HomeAccessSection // ホームアクセスセクション
-        tournamentPasscode={entryPasscode}
-        setTournamentPasscode={setEntryPasscode}
-        entryName={entryName}
-        setEntryName={setEntryName}
-        entryParty={entryParty}
-        setEntryParty={setEntryParty}
-        entryNote={entryNote}
-        setEntryNote={setEntryNote}
         adminPasscode={adminPasscode}
         setAdminPasscode={setAdminPasscode}
         observerLoginPasscode={observerLoginPasscode}
         setObserverLoginPasscode={setObserverLoginPasscode}
-        entryModalOpen={actions.entryModalOpen}
-        setEntryModalOpen={actions.setEntryModalOpen}
-        participantSelectModalOpen={actions.participantSelectModalOpen}
-        setParticipantSelectModalOpen={actions.setParticipantSelectModalOpen}
-        participantTournaments={actions.participantTournaments}
-        onSelectParticipantTournament={actions.onSelectParticipantTournament}
         onRequestCreateTournament={() => actions.onRequestCreateTournament(setCreateModalOpen)}
-        onRequestEntryTournament={actions.onRequestEntryTournament}
-        onEntryTournament={actions.onEntryTournament}
         onCreateTournament={() => {
           void actions.onCreateTournament(setCreateModalOpen);
         }}
@@ -151,12 +117,9 @@ export function HomePage() {
         setCreateTournamentTimeSlot={setCreateTournamentTimeSlot}
         createTournamentCourtCount={createTournamentCourtCount}
         setCreateTournamentCourtCount={setCreateTournamentCourtCount}
-        createTournamentEntryPasscode={createTournamentEntryPasscode}
-        setCreateTournamentEntryPasscode={setCreateTournamentEntryPasscode}
         createTournamentObserverPasscode={createTournamentObserverPasscode}
         setCreateTournamentObserverPasscode={setCreateTournamentObserverPasscode}
         activeTournaments={activeTournaments}
-        onParticipantOpen={actions.onParticipantOpen}
         onObserverLogin={actions.onObserverLogin}
         onAdminLogin={actions.onAdminLogin}
       />

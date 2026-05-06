@@ -2,11 +2,11 @@
 // セッションペイロードの型定義
 
 // scopeの型定義
-export type SessionScope = "login" | "participant" | "observer" | "admin";
+export type SessionScope = "login" | "observer" | "admin";
 
 // セッションペイロードの型定義
 export type SessionPayload = {
-  userId: number;
+  userId?: number;
   scope?: SessionScope;
   tournamentId?: number;
 };

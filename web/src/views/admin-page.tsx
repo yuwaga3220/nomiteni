@@ -4,7 +4,7 @@
 
 import { useLayoutEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { AdminManagementSection, AdminTournamentEditSection, AdminMatchesSection, RealtimeSection } from "@/components/AppSections";
+import { AdminManagementSection, AdminTournamentEditSection, AdminMatchesSection, ObserveSection } from "@/components/AppSections";
 import { useNomiteni } from "@/context/NomiteniContext";
 import { useAdminActions } from "./hooks/useAdminActions";
 
@@ -15,6 +15,7 @@ export function AdminPage() {
   // コンテキストを取得
   const {
     me,
+    isAdminSession,
     forceLoginCardsView,
     state,
     active,
@@ -28,9 +29,6 @@ export function AdminPage() {
     setCourtCountInput,
     observerSetPasscode,
     setObserverSetPasscode,
-    entrySetPasscode,
-    setEntrySetPasscode,
-    checkinState,
     assignableMatches,
     playerName,
     groupedRounds,
@@ -48,12 +46,11 @@ export function AdminPage() {
     tournamentDate,
     tournamentTimeSlot,
     courtCountInput,
-    entrySetPasscode,
     observerSetPasscode,
     tournamentParticipants,
   });
 
-  const allowed = Boolean(me && !forceLoginCardsView && me.role === "ADMIN");
+  const allowed = Boolean(me && !forceLoginCardsView && isAdminSession);
   // 管理者ログインチェック
   useLayoutEffect(() => {
     if (!allowed) router.replace("/");
@@ -83,14 +80,8 @@ export function AdminPage() {
         setCourtCountInput={setCourtCountInput}
         observerSetPasscode={observerSetPasscode}
         setObserverSetPasscode={setObserverSetPasscode}
-        entrySetPasscode={entrySetPasscode}
-        setEntrySetPasscode={setEntrySetPasscode}
-        checkinState={checkinState}
         onSaveTournamentSettings={actions.onSaveTournamentSettings}
         onSetTournamentStatus={actions.onSetTournamentStatus}
-        onSetReady={actions.onSetReady}
-        onSetAbsent={actions.onSetAbsent}
-        onSetUnanswered={actions.onSetUnanswered}
       />
       <AdminTournamentEditSection
         bracketSize={actions.bracketSize}
@@ -114,7 +105,7 @@ export function AdminPage() {
           onWin={actions.onWin}
         />
       )}
-      <RealtimeSection
+      <ObserveSection
         active={active}
         state={state}
         groupedRounds={groupedRounds}

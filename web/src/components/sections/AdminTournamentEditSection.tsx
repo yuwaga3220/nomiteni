@@ -26,6 +26,7 @@ export function AdminTournamentEditSection(props: AdminTournamentEditProps) {
   return (
     <section className="card">
       <h2>トーナメント編集</h2>
+      <p>開始前の大会のドローを変更することができます。</p>
       <select
         value={props.selectedParticipantId1 ?? ""}
         onChange={(e) => props.setSelectedParticipantId1(
@@ -35,7 +36,7 @@ export function AdminTournamentEditSection(props: AdminTournamentEditProps) {
       >
         <option value="">交換元の選手を選択</option>
         {props.participants.map((p) => (
-          <option key={p.userId} value={p.userId}>
+          <option key={p.id} value={p.id}>
             {p.name}
           </option>
         )) }
@@ -49,7 +50,7 @@ export function AdminTournamentEditSection(props: AdminTournamentEditProps) {
       >
         <option value="">交換先の選手を選択</option>
         {props.participants.map((p) => (
-          <option key={p.userId} value={p.userId}>
+          <option key={p.id} value={p.id}>
             {p.name}
           </option>
         )) }

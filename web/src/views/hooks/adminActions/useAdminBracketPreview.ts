@@ -42,7 +42,7 @@ export function useAdminBracketPreview(params: UseAdminBracketPreviewParams) {
         }))
         .sort((a, b) => {
           if (a.normalizedPosition !== b.normalizedPosition) return a.normalizedPosition - b.normalizedPosition;
-          return a.userId - b.userId;
+          return a.id - b.id;
         }),
     [params.tournamentParticipants],
   );

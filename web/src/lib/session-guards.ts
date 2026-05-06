@@ -2,16 +2,18 @@
 // セッションチェック
 
 import { NextResponse } from "next/server";
-import { getPrisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session-cookie";
+import type { SessionPayload } from "@/lib/session.types";
+
+type LoggedInSession = SessionPayload & { userId: number };
 
 // ログイン済みセッション必須（スコープは問わない）
-export async function requireAnySession() {
+export async function requireAnySession(): Promise<{ session: LoggedInSession } | { error: NextResponse }> {
   const session = await getSession();
-  if (!session) {
+  if (!session?.userId) {
     return { error: NextResponse.json({ error: "ログインが必要です。" }, { status: 401 }) };
   }
-  return { session };
+  return { session: session as LoggedInSession };
 }
 
 // 管理者のみ実行できるセッション
@@ -21,19 +23,6 @@ export async function requireAdmin() {
   const { session } = guard;
   if (session.scope !== "admin" || !session.tournamentId) {
     return { error: NextResponse.json({ error: "管理者のみ実行できます。" }, { status: 403 }) };
-  }
-  const prisma = getPrisma();
-  const admin = await prisma.userTournamentRole.findUnique({
-    where: {
-      tournamentId_userId_role: {
-        tournamentId: session.tournamentId,
-        userId: session.userId,
-        role: "ADMIN",
-      },
-    },
-  });
-  if (!admin) {
-    return { error: NextResponse.json({ error: "管理者権限がありません。" }, { status: 403 }) };
   }
   return { session };
 }

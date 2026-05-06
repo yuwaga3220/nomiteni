@@ -3,7 +3,7 @@
 
 import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "@/lib/config";
-import type { SessionPayload, SessionScope } from "@/lib/session.types";
+import type { SessionPayload } from "@/lib/session.types";
 
 // セッショントークンを作成
 export function createToken(payload: SessionPayload): string {
@@ -23,33 +23,9 @@ export function verifySessionToken(token: string): SessionPayload | null {
 export function toClientUser(user: {
   id: number;
   email: string;
-  name: string | null;
-  partyJoin: boolean;
-  note: string | null;
-  checkedIn: boolean;
-  canPlayToday: boolean | null;
-  createdAt: Date;
-  updatedAt: Date;
-  scope?: SessionScope;
 }) {
-  const role =
-    user.scope === "admin"
-      ? "ADMIN"
-      : user.scope === "observer"
-        ? "OBSERVER"
-        : user.scope === "login"
-          ? "LOGIN"
-          : "PARTICIPANT";
   return {
     id: user.id,
     email: user.email,
-    name: user.name,
-    partyJoin: user.partyJoin,
-    note: user.note,
-    checkedIn: user.checkedIn,
-    canPlayToday: user.canPlayToday,
-    createdAt: user.createdAt,
-    updatedAt: user.updatedAt,
-    role,
   };
 }

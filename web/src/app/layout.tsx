@@ -21,10 +21,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   let user: Me | null = null;
   let isLoggedIn = false;
-  if (session) {
+  const isAdminSession = session?.scope === "admin";
+  if (session?.userId) {
     const foundUser = await prisma.user.findUnique({ where: { id: session.userId } });
     if (foundUser) {
-      user = toClientUser({ ...foundUser, scope: session.scope }) as Me;
+      user = toClientUser(foundUser) as Me;
       isLoggedIn = true;
     }
   }
@@ -36,6 +37,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           initialData={{
             user,
             isLoggedIn,
+            isAdminSession,
             state: publicState,
             sessionTournamentId: session?.tournamentId ?? null,
           }}

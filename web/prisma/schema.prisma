@@ -24,24 +24,10 @@ enum MatchStatus {
   FINISHED
 }
 
-enum UserRole {
-  PARTICIPANT
-  ADMIN
-  OBSERVER
-}
-
 model User {
   id              Int                  @id @default(autoincrement())
   email           String               @unique
   password        String
-  name            String?
-  partyJoin       Boolean              @default(false)
-  note            String?
-  checkedIn       Boolean              @default(false)
-  canPlayToday    Boolean?
-  createdAt       DateTime             @default(now())
-  updatedAt       DateTime             @updatedAt
-  tournamentRoles UserTournamentRole[]
 }
 
 model Tournament {
@@ -53,11 +39,8 @@ model Tournament {
   courtCount       Int                  @default(2)
   status           TournamentStatus     @default(ENTRY)
   observerPasscode String?
-  entryPasscode    String?
-  createdAt        DateTime             @default(now())
-  updatedAt        DateTime             @updatedAt
   matches          Match[]
-  userRoles        UserTournamentRole[]
+  participants     Participant[]
 }
 
 model Match {
@@ -71,8 +54,6 @@ model Match {
   status       MatchStatus @default(READY)
   courtNumber  Int?
   nextMatchId  Int?
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
 
   tournament Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
   nextMatch  Match?     @relation("MatchNext", fields: [nextMatchId], references: [id], onDelete: SetNull)
@@ -81,25 +62,14 @@ model Match {
   @@unique([tournamentId, round, position])
 }
 
-model AppSetting {
-  key   String @id
-  value String
-}
-
-model UserTournamentRole {
+model Participant {
   id           Int      @id @default(autoincrement())
   tournamentId Int
-  userId       Int
-  role         UserRole
+  name         String
   initialPosition Int?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
 
   tournament Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
-  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([tournamentId, userId, role])
-  @@unique([tournamentId, role, initialPosition])
-  @@index([userId])
-  @@index([tournamentId, role])
+  @@unique([tournamentId, initialPosition])
+  @@index([tournamentId])
 }

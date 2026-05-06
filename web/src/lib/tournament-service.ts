@@ -35,7 +35,7 @@ export async function buildPublicState() {
         ],
       },
     },
-    orderBy: { createdAt: "desc" },
+    orderBy: { id: "desc" },
     select: {
       id: true,
       name: true,
@@ -59,18 +59,22 @@ export async function buildPublicState() {
       },
     },
   });
-  const users = await prisma.user.findMany({
-    orderBy: [{ checkedIn: "desc" }, { name: "asc" }],
-    select: {
-      id: true,
-      name: true,
-      checkedIn: true,
-      canPlayToday: true,
-      partyJoin: true,
-      note: true,
-    },
-  });
-  return { users, activeTournaments };
+  const tournamentIds = activeTournaments.map((tournament) => tournament.id);
+  const participants = tournamentIds.length
+    ? await prisma.participant.findMany({
+      where: { tournamentId: { in: tournamentIds } },
+      orderBy: [{ initialPosition: "asc" }, { name: "asc" }],
+      select: {
+        id: true,
+        name: true,
+      },
+    })
+    : [];
+  const publicParticipants = participants.map((participant) => ({
+    id: participant.id,
+    name: participant.name,
+  }));
+  return { participants: publicParticipants, activeTournaments };
 }
 
 // 観戦パスコードが一致するRUNNING OR FINISHEDのトーナメントをひとつだけ取得
@@ -81,19 +85,7 @@ export async function getActiveTournamentByObserverPasscode(passcode: string) {
       status: { in: [TournamentStatus.RUNNING, TournamentStatus.FINISHED] },
       observerPasscode: passcode,
     },
-    orderBy: { createdAt: "desc" },
-  });
-}
-
-// エントリーパスコードが一致するアクティブなトーナメントをひとつだけ取得（複数ある場合は createdAt が新しい方）
-export async function getActiveTournamentByEntryPasscode(passcode: string) {
-  const prisma = getPrisma();
-  return prisma.tournament.findFirst({
-    where: {
-      status: { in: [TournamentStatus.ENTRY] },
-      entryPasscode: passcode,
-    },
-    orderBy: { createdAt: "desc" },
+    orderBy: { id: "desc" },
   });
 }
 

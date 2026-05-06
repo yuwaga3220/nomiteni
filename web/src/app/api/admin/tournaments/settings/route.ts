@@ -11,28 +11,15 @@ export async function GET() {
 
   const prisma = getPrisma();
   const t = scoped.tournament;
-  const participants = await (prisma as unknown as {
-    userTournamentRole: { // 参加者を取得
-      findMany: (args: unknown) => Promise<Array<{
-        userId: number;
-        initialPosition: number | null;
-        user: { name: string | null };
-      }>>;
-    };
-  }).userTournamentRole.findMany({ // 参加者を取得
+  const participants = await prisma.participant.findMany({ // 参加者を取得
     where: {
       tournamentId: t.id,
-      role: "PARTICIPANT",
     },
-    orderBy: [{ initialPosition: "asc" }, { userId: "asc" }],
+    orderBy: [{ initialPosition: "asc" }, { id: "asc" }],
     select: {
-      userId: true,
+      id: true,
       initialPosition: true,
-      user: {
-        select: {
-          name: true,
-        },
-      },
+      name: true,
     },
   });
   return NextResponse.json({
@@ -42,13 +29,12 @@ export async function GET() {
       eventDate: t.eventDate,
       timeSlot: t.timeSlot,
       courtCount: t.courtCount,
-      entryPasscode: t.entryPasscode,
       observerPasscode: t.observerPasscode,
     },
     participants: participants.map((p) => ({
-      userId: p.userId,
+      id: p.id,
       initialPosition: p.initialPosition,
-      name: p.user.name ?? `Player #${p.userId}`,
+      name: p.name,
     })),
   });
 }
@@ -72,7 +58,6 @@ export async function POST(req: Request) {
       eventDate: parsed.data.eventDate ?? null,
       timeSlot: parsed.data.timeSlot ?? null,
       courtCount: parsed.data.courtCount,
-      entryPasscode: parsed.data.entryPasscode,
       observerPasscode: parsed.data.observerPasscode,
     },
   });

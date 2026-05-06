@@ -47,6 +47,7 @@ export function AdminMatchesSection(props: AdminMatchesProps) {
   return (
     <section className="card">
       <h2>試合運営</h2>
+      <p>試合を開始したり、勝者を選択したりすることができます。</p>
       <h3>READY</h3>
       {readyMatches.length === 0 && <div className="statusText">READYの試合はありません</div>}
       {readyMatches.map(renderMatchRow)}

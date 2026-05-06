@@ -20,65 +20,45 @@ export async function POST(req: Request) {
 
     const prisma = getPrisma();
 
-    const user1 = await prisma.userTournamentRole.findUnique({ 
-        where: { tournamentId_userId_role: { 
+    const participant1 = await prisma.participant.findFirst({ 
+        where: {
+            id: parsed.data.id1,
             tournamentId: scoped.tournament.id, 
-            userId: parsed.data.id1, 
-            role: "PARTICIPANT" 
-        } } 
+        } 
     });
-    const user2 = await prisma.userTournamentRole.findUnique({ 
-        where: { tournamentId_userId_role: { 
+    const participant2 = await prisma.participant.findFirst({ 
+        where: {
+            id: parsed.data.id2,
             tournamentId: scoped.tournament.id, 
-            userId: parsed.data.id2, 
-            role: "PARTICIPANT" 
-        } } 
+        } 
     });
     
-    if (!user1 || !user2) {
+    if (!participant1 || !participant2) {
         return NextResponse.json({ error: "参加者を選択してください。" }, { status: 404 });
     }
     if (parsed.data.id1 === parsed.data.id2) {
         return NextResponse.json({ error: "同一の参加者は交換できません。" }, { status: 400 });
     }
 
-    const initialPosition1 = user1.initialPosition ?? null;
-    const initialPosition2 = user2.initialPosition ?? null;
+    const initialPosition1 = participant1.initialPosition ?? null;
+    const initialPosition2 = participant2.initialPosition ?? null;
 
-    const [userTournamentRole1, userTournamentRole2] = await prisma.$transaction(async (tx) => {
-        const updated1ToNull = await tx.userTournamentRole.update({
-            where: {
-                tournamentId_userId_role: {
-                    tournamentId: scoped.tournament.id,
-                    userId: parsed.data.id1,
-                    role: "PARTICIPANT",
-                },
-            },
+    const [updatedParticipant1, updatedParticipant2] = await prisma.$transaction(async (tx) => {
+        await tx.participant.update({
+            where: { id: parsed.data.id1 },
             data: { initialPosition: null },
         });
-        const updated2 = await tx.userTournamentRole.update({
-            where: {
-                tournamentId_userId_role: {
-                    tournamentId: scoped.tournament.id,
-                    userId: parsed.data.id2,
-                    role: "PARTICIPANT",
-                },
-            },
+        const updated2 = await tx.participant.update({
+            where: { id: parsed.data.id2 },
             data: { initialPosition: initialPosition1 },
         });
-        const updated1 = await tx.userTournamentRole.update({
-            where: {
-                tournamentId_userId_role: {
-                    tournamentId: scoped.tournament.id,
-                    userId: parsed.data.id1,
-                    role: "PARTICIPANT",
-                },
-            },
+        const updated1 = await tx.participant.update({
+            where: { id: parsed.data.id1 },
             data: { initialPosition: initialPosition2 },
         });
         return [updated1, updated2];
     });
 
     await broadcastState();
-    return NextResponse.json({ userTournamentRole1, userTournamentRole2 });
+    return NextResponse.json({ participant1: updatedParticipant1, participant2: updatedParticipant2 });
 }

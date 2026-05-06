@@ -2,7 +2,7 @@
 // 管理者メニューセクション
 "use client";
 
-import type { CheckinState, PublicState, Tournament, User } from "@/types";
+import type { PublicState, Tournament } from "@/types";
 
 type TournamentStatus = "ENTRY" | "READY" | "RUNNING" | "FINISHED";
 
@@ -20,14 +20,8 @@ type AdminManagementProps = {
   setCourtCountInput: (v: number) => void;
   observerSetPasscode: string;
   setObserverSetPasscode: (v: string) => void;
-  entrySetPasscode: string;
-  setEntrySetPasscode: (v: string) => void;
-  checkinState: (u: User) => CheckinState;
   onSaveTournamentSettings: () => void;
   onSetTournamentStatus: (status: TournamentStatus) => void;
-  onSetReady: (userId: number) => void;
-  onSetAbsent: (userId: number) => void;
-  onSetUnanswered: (userId: number) => void;
 };
 
 // 管理者メニューセクション
@@ -86,13 +80,6 @@ export function AdminManagementSection(props: AdminManagementProps) {
         />
         <label>コート数</label>
         <input type="number" min={1} value={props.courtCountInput} onChange={(e) => props.setCourtCountInput(Number(e.target.value))} />
-        <label>エントリー用パスコード</label>
-        <input
-          type="password"
-          placeholder="エントリー用パスコード"
-          value={props.entrySetPasscode}
-          onChange={(e) => props.setEntrySetPasscode(e.target.value)}
-        />
         <label>観戦用パスコード</label>
         <input
           type="password"
@@ -102,28 +89,6 @@ export function AdminManagementSection(props: AdminManagementProps) {
         />
         <button onClick={props.onSaveTournamentSettings}>大会設定を保存</button>
         
-      </div>
-      <div className="card">
-        <h2>参加者チェックイン（管理者操作）</h2>
-        <div className="list">
-          {(props.state?.users ?? []).map((u) => (
-            <div key={u.id} className="listItem">
-              <span>{u.name}</span>
-              <button onClick={() => props.onSetReady(u.id)}>
-                チェックイン済
-              </button>
-
-              <button onClick={() => props.onSetAbsent(u.id)}>
-                不参加（def）
-              </button>
-
-              <button onClick={() => props.onSetUnanswered(u.id)}>
-                未回答
-              </button>
-
-            </div>
-          ))}
-        </div>
       </div>
     </section>
   );

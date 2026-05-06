@@ -9,6 +9,9 @@ export async function POST() {
   if (!session) {
     return NextResponse.json({ error: "ログインが必要です。" }, { status: 401 });
   }
+  if (!session.userId) {
+    return NextResponse.json({ error: "ログインが必要です。" }, { status: 401 });
+  }
 
   const prisma = getPrisma();
   const user = await prisma.user.findUnique({ where: { id: session.userId } });
@@ -20,13 +23,13 @@ export async function POST() {
   if (atLoginHub) {
     return NextResponse.json({
       ok: true,
-      user: toClientUser({ ...user, scope: "login" }),
+      user: toClientUser(user),
     });
   }
 
   const res = NextResponse.json({
     ok: true,
-    user: toClientUser({ ...user, scope: "login" }),
+    user: toClientUser(user),
   });
   res.cookies.set("nomiteni_token", createToken({ userId: user.id, scope: "login" }), {
     httpOnly: true,

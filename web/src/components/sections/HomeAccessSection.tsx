@@ -4,36 +4,17 @@
 "use client";
 
 import type { Tournament } from "@/types";
-import { ParticipantEntryModal } from "@/components/modals/ParticipantEntryModal";
 import { CreateTournamentModal } from "@/components/modals/CreateTournamentModal";
-import { ParticipantSelectModal } from "@/components/modals/ParticipantSelectModal";
 
 // ホームアクセスセクションのプロパティ
 type HomeAccessProps = {
-  tournamentPasscode: string;
-  setTournamentPasscode: (v: string) => void;
-  entryName: string;
-  setEntryName: (v: string) => void;
-  entryParty: boolean;
-  setEntryParty: (v: boolean) => void;
-  entryNote: string;
-  setEntryNote: (v: string) => void;
   adminPasscode: string;
   setAdminPasscode: (v: string) => void;
   observerLoginPasscode: string;
   setObserverLoginPasscode: (v: string) => void;
-  onParticipantOpen: () => void;
-  participantSelectModalOpen: boolean;
-  setParticipantSelectModalOpen: (v: boolean) => void;
-  participantTournaments: Array<{ id: number; name: string; status: string; eventDate?: string | null }>;
-  onSelectParticipantTournament: (tournamentId: number) => void;
   onAdminLogin: () => void;
   onObserverLogin: () => void;
   onRequestCreateTournament: () => void;
-  onRequestEntryTournament: () => void;
-  entryModalOpen: boolean;
-  setEntryModalOpen: (v: boolean) => void;
-  onEntryTournament: () => Promise<void>;
   createModalOpen: boolean;
   setCreateModalOpen: (v: boolean) => void;
   createTournamentName: string;
@@ -44,8 +25,6 @@ type HomeAccessProps = {
   setCreateTournamentTimeSlot: (v: string) => void;
   createTournamentCourtCount: number;
   setCreateTournamentCourtCount: (v: number) => void;
-  createTournamentEntryPasscode: string;
-  setCreateTournamentEntryPasscode: (v: string) => void;
   createTournamentObserverPasscode: string;
   setCreateTournamentObserverPasscode: (v: string) => void;
   onCreateTournament: () => void;
@@ -61,18 +40,10 @@ export function HomeAccessSection(props: HomeAccessProps) {
           <button className="bigCreateTournamentButton" onClick={props.onRequestCreateTournament}>
             大会を追加する
           </button>
-          <button className="bigCreateTournamentButton" onClick={props.onRequestEntryTournament}>
-            大会にエントリーする
-          </button>
         </div>
       </div>
       <section className="grid2 loginGrid">
         <div className="subgrid">
-          <div className="card">
-            <h2>エントリー済みの方はこちら</h2>
-            <button onClick={props.onParticipantOpen}>大会用ページへ移動する</button>
-          </div>
-
           <div className="card">
             <h2>リアルタイムで試合観戦する</h2>
             <input
@@ -125,30 +96,9 @@ export function HomeAccessSection(props: HomeAccessProps) {
         setCreateTournamentTimeSlot={props.setCreateTournamentTimeSlot}
         createTournamentCourtCount={props.createTournamentCourtCount}
         setCreateTournamentCourtCount={props.setCreateTournamentCourtCount}
-        createTournamentEntryPasscode={props.createTournamentEntryPasscode}
-        setCreateTournamentEntryPasscode={props.setCreateTournamentEntryPasscode}
         createTournamentObserverPasscode={props.createTournamentObserverPasscode}
         setCreateTournamentObserverPasscode={props.setCreateTournamentObserverPasscode}
         onCreateTournament={props.onCreateTournament}
-      />
-      <ParticipantEntryModal
-        isOpen={props.entryModalOpen}
-        onClose={() => props.setEntryModalOpen(false)}
-        tournamentPasscode={props.tournamentPasscode}
-        setTournamentPasscode={props.setTournamentPasscode}
-        entryName={props.entryName}
-        setEntryName={props.setEntryName}
-        entryParty={props.entryParty}
-        setEntryParty={props.setEntryParty}
-        entryNote={props.entryNote}
-        setEntryNote={props.setEntryNote}
-        onEntrySubmit={props.onEntryTournament}
-      />
-      <ParticipantSelectModal
-        isOpen={props.participantSelectModalOpen}
-        onClose={() => props.setParticipantSelectModalOpen(false)}
-        participantTournaments={props.participantTournaments}
-        onSelectParticipantTournament={props.onSelectParticipantTournament}
       />
     </>
   );

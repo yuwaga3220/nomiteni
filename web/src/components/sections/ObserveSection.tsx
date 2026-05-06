@@ -1,12 +1,12 @@
-// web/src/components/sections/RealtimeSection.tsx
-// リアルタイム進行表示セクション
+// web/src/components/sections/ObserveSection.tsx
+// 観戦表示セクション
 "use client";
 
 import { useMemo } from "react";
 import type { Match, PublicState, Tournament } from "@/types";
 import { TournamentBracketView, type BracketRoundView } from "./TournamentBracketView";
 
-type RealtimeProps = {
+type ObserveProps = {
   active: Tournament | null | undefined;
   state: PublicState | null;
   groupedRounds: Array<[number, Match[]]>;
@@ -16,8 +16,8 @@ type RealtimeProps = {
   bracketRounds?: BracketRoundView[];
 };
 
-// リアルタイム進行表示セクション
-export function RealtimeSection(props: RealtimeProps) {
+// 観戦表示セクション
+export function ObserveSection(props: ObserveProps) {
   const tournamentMatches = useMemo(
     () => props.active?.matches ?? props.groupedRounds.flatMap(([, matches]) => matches),
     [props.active?.matches, props.groupedRounds],

@@ -11,7 +11,7 @@ const adminPasscodeSchema = z.object({
 // 管理者パスコードで大会コンテキストに入る（アカウントログイン済み必須）
 export async function POST(req: Request) {
   const session = await getSession();
-  if (!session) {
+  if (!session?.userId) {
     return NextResponse.json({ error: "先にログインしてください。" }, { status: 401 });
   }
 
@@ -30,20 +30,8 @@ export async function POST(req: Request) {
   if (!tournament) {
     return NextResponse.json({ error: "管理者パスコードが違います。" }, { status: 401 });
   }
-  await prisma.userTournamentRole.upsert({
-    where: {
-      tournamentId_userId_role: {
-        tournamentId: tournament.id,
-        userId: user.id,
-        role: "ADMIN",
-      },
-    },
-    create: { tournamentId: tournament.id, userId: user.id, role: "ADMIN" },
-    update: {},
-  });
-
   const res = NextResponse.json({
-    user: toClientUser({ ...user, scope: "admin" }),
+    user: toClientUser(user),
     tournamentId: tournament.id,
   });
   res.cookies.set(

@@ -14,7 +14,6 @@ type UseHomeTournamentCreationActionsParams = {
   createTournamentDate: string;
   createTournamentTimeSlot: string;
   createTournamentCourtCount: number;
-  createTournamentEntryPasscode: string;
   createTournamentObserverPasscode: string;
 };
 
@@ -32,8 +31,8 @@ export function useHomeTournamentCreationActions(params: UseHomeTournamentCreati
     try {
       params.ensureLoginCredentials();
       if (!params.createTournamentName) throw new Error("大会名を入力してください。");
-      if (!params.createTournamentEntryPasscode || !params.createTournamentObserverPasscode) {
-        throw new Error("大会/観戦パスコードを入力してください。");
+      if (!params.createTournamentObserverPasscode) {
+        throw new Error("観戦パスコードを入力してください。");
       }
       const created = await api<{ tournamentId: number; adminPasscode: string }>("/api/tournaments/create", {
         method: "POST",
@@ -42,7 +41,6 @@ export function useHomeTournamentCreationActions(params: UseHomeTournamentCreati
           eventDate: params.createTournamentDate || null,
           timeSlot: params.createTournamentTimeSlot || null,
           courtCount: params.createTournamentCourtCount,
-          entryPasscode: params.createTournamentEntryPasscode,
           observerPasscode: params.createTournamentObserverPasscode,
         }),
       });

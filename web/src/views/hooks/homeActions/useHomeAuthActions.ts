@@ -22,7 +22,7 @@ export function useHomeAuthActions(params: UseHomeAuthActionsParams) {
         method: "POST",
         body: JSON.stringify({ email: params.authEmail, password: params.authPassword }),
       });
-      params.setMessage("ログイン情報を入力しました。下のボタンで参加者/管理者/観戦者を選択してください。");
+      params.setMessage("ログイン情報を入力しました。管理者パスコードで管理画面へ進んでください。");
       params.setAuthModalState("none");
     });
   };

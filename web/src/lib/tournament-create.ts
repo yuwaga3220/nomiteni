@@ -16,19 +16,19 @@ type TournamentSettingsInput = z.infer<typeof tournamentSettingsSchema>;
 type DbClient = PrismaClient | Prisma.TransactionClient;
 
 function sortByInitialPosition(
-  a: { userId: number; initialPosition: number | null }, 
-  b: { userId: number; initialPosition: number | null }
+  a: { id: number; initialPosition: number | null }, 
+  b: { id: number; initialPosition: number | null }
 ) {
   const aPos = a.initialPosition ?? Number.MAX_SAFE_INTEGER;
   const bPos = b.initialPosition ?? Number.MAX_SAFE_INTEGER;
   if (aPos !== bPos) return aPos - bPos;
-  return a.userId - b.userId;
+  return a.id - b.id;
 }
 
 export async function recreateTournamentMatches(db: DbClient, tournamentId: number) {
-  const players = await db.userTournamentRole.findMany({
-    where: { tournamentId, role: "PARTICIPANT" },
-    select: { userId: true, initialPosition: true },
+  const players = await db.participant.findMany({
+    where: { tournamentId },
+    select: { id: true, initialPosition: true },
   });
 
   // 既存の該当トーナメントのmatchesを全て削除
@@ -36,7 +36,7 @@ export async function recreateTournamentMatches(db: DbClient, tournamentId: numb
 
   if (players.length < 2) return 0;
 
-  const playerIds = [...players].sort(sortByInitialPosition).map((p) => p.userId);
+  const playerIds = [...players].sort(sortByInitialPosition).map((p) => p.id);
   const size = getBracketSize(playerIds.length);
   const rounds = Math.log2(size); // ラウンド数
   const slots: Array<number | null> = [...playerIds];
@@ -96,7 +96,6 @@ export async function createTournamentWithSettings(data: TournamentSettingsInput
       courtCount: data.courtCount,
       status: TournamentStatus.ENTRY,
       observerPasscode: data.observerPasscode,
-      entryPasscode: data.entryPasscode,
     },
   });
 

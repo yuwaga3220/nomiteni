@@ -3,7 +3,7 @@
 "use client";
 
 import { createContext, useContext, type Dispatch, type SetStateAction } from "react";
-import type { AuthMode, CheckinState, Match, Me, PublicState, TournamentBrief, TournamentParticipant, User } from "@/types";
+import type { AuthMode, Match, Me, PublicState, TournamentParticipant } from "@/types";
 
 export type NomiteniContextValue = {
   me: Me | null;
@@ -19,16 +19,6 @@ export type NomiteniContextValue = {
   setAuthEmail: Dispatch<SetStateAction<string>>;
   authPassword: string;
   setAuthPassword: Dispatch<SetStateAction<string>>;
-  entryPasscode: string;
-  setEntryPasscode: Dispatch<SetStateAction<string>>;
-  entryTournament: TournamentBrief | null;
-  setEntryTournament: Dispatch<SetStateAction<TournamentBrief | null>>;
-  entryName: string;
-  setEntryName: Dispatch<SetStateAction<string>>;
-  entryParty: boolean;
-  setEntryParty: Dispatch<SetStateAction<boolean>>;
-  entryNote: string;
-  setEntryNote: Dispatch<SetStateAction<string>>;
   adminPasscode: string;
   setAdminPasscode: Dispatch<SetStateAction<string>>;
   observerLoginPasscode: string;
@@ -43,14 +33,10 @@ export type NomiteniContextValue = {
   setCreateTournamentTimeSlot: Dispatch<SetStateAction<string>>;
   createTournamentCourtCount: number;
   setCreateTournamentCourtCount: Dispatch<SetStateAction<number>>;
-  createTournamentEntryPasscode: string;
-  setCreateTournamentEntryPasscode: Dispatch<SetStateAction<string>>;
   createTournamentObserverPasscode: string;
   setCreateTournamentObserverPasscode: Dispatch<SetStateAction<string>>;
   observerSetPasscode: string;
   setObserverSetPasscode: Dispatch<SetStateAction<string>>;
-  entrySetPasscode: string;
-  setEntrySetPasscode: Dispatch<SetStateAction<string>>;
   tournamentName: string;
   setTournamentName: Dispatch<SetStateAction<string>>;
   tournamentDate: string;
@@ -60,6 +46,8 @@ export type NomiteniContextValue = {
   courtCountInput: number;
   setCourtCountInput: Dispatch<SetStateAction<number>>;
   isLoggedIn: boolean;
+  isAdminSession: boolean;
+  sessionTournamentId: number | null;
   isLoginReady: boolean;
   activeTournaments: PublicState["activeTournaments"];
   active: PublicState["activeTournaments"][number] | null;
@@ -67,7 +55,6 @@ export type NomiteniContextValue = {
   refresh: () => Promise<void>;
   playerName: (id: number | null) => string;
   matchStatusLabel: (status: Match["status"]) => string;
-  checkinState: (u: User) => CheckinState;
   call: (fn: () => Promise<unknown>) => Promise<void>;
   ensureLoginCredentials: () => void;
   groupedRounds: Array<[number, Match[]]>;

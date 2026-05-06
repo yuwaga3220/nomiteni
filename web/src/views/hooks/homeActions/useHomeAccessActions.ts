@@ -4,37 +4,38 @@ import type { AppRouterInstance } from "next/dist/shared/lib/app-router-context.
 import { api } from "@/lib/client/api";
 import type { AuthMode, Me } from "@/types";
 
-type UseHomeRoleActionsParams = {
+type UseHomeAccessActionsParams = {
   router: AppRouterInstance;
   setMe: (me: Me | null) => void;
   setAuthModalState: (mode: AuthMode) => void;
   isLoginReady: boolean;
   setMessage: (message: string) => void;
   setForceLoginCardsView: (value: boolean) => void;
-  call: (fn: () => Promise<unknown>) => Promise<void>;
   ensureLoginCredentials: () => void;
   observerLoginPasscode: string;
   adminPasscode: string;
 };
 
-export function useHomeRoleActions(params: UseHomeRoleActionsParams) {
+export function useHomeAccessActions(params: UseHomeAccessActionsParams) {
   const openLoginModalWithMessage = () => {
     params.setMessage("まずはログインしてください。");
     params.setAuthModalState("login");
   };
 
   const onObserverLogin = () => {
-    if (!params.isLoginReady) {
-      openLoginModalWithMessage();
-      return;
-    }
-    params.call(() => {
-      params.ensureLoginCredentials();
-      return api("/api/auth/observer", {
-        method: "POST",
-        body: JSON.stringify({ passcode: params.observerLoginPasscode }),
-      });
-    });
+    (async () => {
+      try {
+        if (!params.observerLoginPasscode) throw new Error("観戦パスコードを入力してください。");
+        await api("/api/auth/observer", {
+          method: "POST",
+          body: JSON.stringify({ passcode: params.observerLoginPasscode }),
+        });
+        params.setForceLoginCardsView(false);
+        window.location.href = "/observer";
+      } catch (e) {
+        params.setMessage((e as Error).message);
+      }
+    })();
   };
 
   const onAdminLogin = () => {
@@ -49,10 +50,10 @@ export function useHomeRoleActions(params: UseHomeRoleActionsParams) {
           method: "POST",
           body: JSON.stringify({ passcode: params.adminPasscode }),
         });
-        // /admin 遷移前に role を即時反映し、ガードによる誤リダイレクトを防ぐ
+        // /admin 遷移前にログインユーザーを即時反映し、ガードによる誤リダイレクトを防ぐ
         params.setMe(result.user);
         params.setForceLoginCardsView(false);
-        params.router.replace("/admin");
+        window.location.href = "/admin";
       } catch (e) {
         params.setMessage((e as Error).message);
       }

@@ -1,18 +1,7 @@
-/**
- * 型定義
- */
-export type Role = "LOGIN" |"PARTICIPANT" | "ADMIN" | "OBSERVER";
-
-export type User = {
+export type Me = {
   id: number;
-  name: string | null;
-  checkedIn: boolean;
-  canPlayToday: boolean | null;
-  partyJoin: boolean;
-  note: string | null;
+  email: string;
 };
-
-export type Me = User & { email: string; role: Role };
 
 export type Match = {
   id: number;
@@ -32,32 +21,22 @@ export type Tournament = {
   eventDate?: string | null;
   timeSlot?: string | null;
   courtCount?: number;
-  entryPasscode?: string | null;
   observerPasscode?: string | null;
   status: "ENTRY" | "READY" | "RUNNING" | "FINISHED";
   matches: Match[];
 };
-export type TournamentBrief = {
-  id: number;
-  name: string;
-  eventDate?: string | null;
-  timeSlot?: string | null;
-  courtCount?: number;
-  entryPasscode?: string | null;
-  observerPasscode?: string | null;
-  status: "ENTRY" | "READY" | "RUNNING" | "FINISHED";
-};
-
 export type TournamentParticipant = {
-  userId: number;
+  id: number;
   name: string;
   initialPosition: number | null;
 };
 
 export type PublicState = {
-  users: User[];
+  participants: Array<{
+    id: number;
+    name: string;
+  }>;
   activeTournaments: Tournament[];
 };
 
-export type CheckinState = "UNANSWERED" | "READY" | "ABSENT";
 export type AuthMode = "none" | "signup" | "login"; // 認証モード(モーダルの表示管理)

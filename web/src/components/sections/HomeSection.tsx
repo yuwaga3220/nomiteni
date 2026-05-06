@@ -5,6 +5,7 @@
 
 import type { Tournament } from "@/types";
 import { CreateTournamentModal } from "@/components/modals/CreateTournamentModal";
+import { getStatusLabel } from "@/lib/status-label";
 
 // ホームセクションのプロパティ
 type HomeProps = {
@@ -35,46 +36,29 @@ type HomeProps = {
 export function HomeSection(props: HomeProps) {
   return (
     <>
-      <div className="topCreateTournament">
-        <div className="row topActionRow">
-          <button className="bigCreateTournamentButton" onClick={props.onRequestCreateTournament}>
-            大会を追加する
+      
+      <section className="subgrid loginGrid centeredCards">
+        <div className="card">
+          <h2>大会運営者はこちら</h2>
+          <input
+            placeholder="管理者パスワード（adm-***）を入力してください。"
+            type="password"
+            value={props.adminPasscode}
+            onChange={(e) => props.setAdminPasscode(e.target.value)}
+          />
+          <button className="homeSectionButton roleAdminButton" onClick={props.onAdminLogin}>
+            管理画面へ
           </button>
-        </div>
-      </div>
-      <section className="grid2 loginGrid">
-        <div className="subgrid">
-          <div className="card">
-            <h2>リアルタイムで試合観戦する</h2>
-            <input
-              placeholder="観戦パスコード"
-              type="password"
-              value={props.observerLoginPasscode}
-              onChange={(e) => props.setObserverLoginPasscode(e.target.value)}
-            />
-            <button onClick={props.onObserverLogin}>リアルタイム観戦する</button>
-          </div>
-
-          <div className="card">
-            <h2>大会運営者はこちら</h2>
-            <input
-              placeholder="運営パスコード"
-              type="password"
-              value={props.adminPasscode}
-              onChange={(e) => props.setAdminPasscode(e.target.value)}
-            />
-            <button onClick={props.onAdminLogin}>管理画面へ</button>
-          </div>
         </div>
 
         <div className="card">
-          <h2>現在の大会状況</h2>
+          <h2>現在の大会一覧</h2>
           {props.activeTournaments.length > 0 ? (
             <div className="list">
               {props.activeTournaments.map((tournament) => (
                 <div key={tournament.id} className="listItem">
                   <span>
-                    {tournament.name}({tournament.status}) / 開催日: {tournament.eventDate || "-"}
+                    {tournament.name}({getStatusLabel(tournament.status)}) / 開催日: {tournament.eventDate || "-"}
                   </span>
                 </div>
               ))}
@@ -82,7 +66,28 @@ export function HomeSection(props: HomeProps) {
           ) : (
             <p>現在進行中/準備中の大会はありません。</p>
           )}
+          <div className="topCreateTournament">
+            <div className="row topActionRow">
+              <button className="homeSectionButton roleCreateButton" onClick={props.onRequestCreateTournament}>
+                大会を追加する
+              </button>
+            </div>
+          </div>
         </div>
+
+        <div className="card">
+          <h2>試合観戦する</h2>
+          <input
+            placeholder="観戦パスコードを入力してください。"
+            type="password"
+            value={props.observerLoginPasscode}
+            onChange={(e) => props.setObserverLoginPasscode(e.target.value)}
+          />
+          <button className="homeSectionButton roleObserverButton" onClick={props.onObserverLogin}>
+            観戦画面へ
+          </button>
+        </div>
+
       </section>
 
       <CreateTournamentModal

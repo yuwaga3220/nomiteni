@@ -1,8 +1,8 @@
 :root {
   font-family: "Segoe UI", sans-serif;
   line-height: 1.45;
-  color: #1a1a1a;
-  background: #f4f6fa;
+  color: #2f3f2f;
+  background: #ffffff;
 }
 
 * {
@@ -29,9 +29,9 @@ body {
   margin-top: 0;
   margin-bottom: 8px;
   padding: 14px 20px;
-  background: #1f4ea3;
-  color: #fff;
-  border-bottom: 1px solid #12336f;
+  background: #b8dd95;
+  color: #243224;
+  border-bottom: 1px solid #8eb86c;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -42,7 +42,7 @@ body {
   margin: 0;
   font-size: 24px;
   font-weight: 700;
-  color: #fff;
+  color: #243224;
 }
 
 .headerActions {
@@ -71,8 +71,20 @@ body {
   font-weight: 700;
 }
 
+.homeSectionButton {
+  width: 160px;
+  max-width: 100%;
+  min-height: 44px;
+  align-self: flex-end;
+}
+
 .loginGrid {
   align-items: start;
+}
+
+.centeredCards > .card {
+  width: min(720px, 100%);
+  margin-inline: auto;
 }
 
 .modalOverlay {
@@ -88,9 +100,9 @@ body {
 
 .modalCard {
   width: min(520px, 100%);
-  background: #fff;
+  background: #ffffff;
   border-radius: 10px;
-  border: 1px solid #dce1ea;
+  border: 1px solid #d7e7c6;
   padding: 16px;
   display: flex;
   flex-direction: column;
@@ -104,13 +116,20 @@ body {
 }
 
 .card {
-  background: #fff;
+  background: #ffffff;
   border-radius: 10px;
   padding: 16px;
-  border: 1px solid #dce1ea;
+  border: 1px solid #d7e7c6;
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
+
+.card h2,
+.card h3 {
+  margin: 0;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #dfe8d7;
 }
 
 input,
@@ -120,23 +139,26 @@ button {
   font: inherit;
   padding: 8px 10px;
   border-radius: 8px;
-  border: 1px solid #c5cedd;
+  border: 1px solid #b7cfa1;
 }
 
 button {
-  background: #1f4ea3;
-  color: #fff;
+  background: #4d73b9;
+  color: #ffffff;
   border: none;
+  width: fit-content;
+  max-width: 100%;
+  align-self: flex-start;
   cursor: pointer;
   transition: background-color 0.16s ease, transform 0.08s ease;
 }
 
 button:hover {
-  background: #174187;
+  background: #3f62a2;
 }
 
 button:active {
-  background: #12336f;
+  background: #36548b;
   transform: translateY(1px);
 }
 
@@ -147,13 +169,61 @@ button:disabled {
 
 button:disabled:hover,
 button:disabled:active {
-  background: #1f4ea3;
+  background: #4d73b9;
   transform: none;
 }
 
+.roleAdminButton {
+  background: #4d73b9;
+}
+
+.roleAdminButton:hover {
+  background: #3f62a2;
+}
+
+.roleAdminButton:active {
+  background: #36548b;
+}
+
+.roleCreateButton {
+  background: #d38a2a;
+}
+
+.roleCreateButton:hover {
+  background: #bb7822;
+}
+
+.roleCreateButton:active {
+  background: #9f651d;
+}
+
+.roleObserverButton {
+  background: #6fa35a;
+}
+
+.roleObserverButton:hover {
+  background: #5f8e4c;
+}
+
+.roleObserverButton:active {
+  background: #507942;
+}
+
+.roleDeleteButton {
+  background: #d35b5b;
+}
+
+.roleDeleteButton:hover {
+  background: #b94a4a;
+}
+
+.roleDeleteButton:active {
+  background: #9f3f3f;
+}
+
 .message {
-  background: #e9f2ff;
-  border: 1px solid #bfd7ff;
+  background: #eef8e5;
+  border: 1px solid #c9e2af;
   padding: 10px;
   border-radius: 8px;
 }
@@ -188,6 +258,21 @@ button:disabled:active {
   min-width: 200px;
 }
 
+.bracketViewport {
+  overflow-x: auto;
+  overflow-y: visible;
+  padding-bottom: 14px;
+}
+
+.bracketViewport svg {
+  overflow: visible;
+}
+
+.bracketViewport p {
+  margin: 0;
+  line-height: 1.2;
+}
+
 .tournamentBracket {
   --bracket-gap: 72px;
   --branch-line: 25px;
@@ -195,7 +280,7 @@ button:disabled:active {
   --merge-line: calc(var(--branch-line) + 25px);
   --merge-trunk-line: calc(var(--bracket-gap) - var(--merge-line));
   --bracket-line-width: 2px;
-  --bracket-line-color: #8ca2cb;
+  --bracket-line-color: #7fa35f;
   display: flex;
   gap: var(--bracket-gap);
   overflow-x: auto;
@@ -245,9 +330,9 @@ button:disabled:active {
 
 .tournamentBracketMatch {
   position: relative;
-  border: 1px solid #d4dced;
+  border: 1px solid #a8c487;
   border-radius: 8px;
-  background: #fafcff;
+  background: #f3f9ea;
 }
 
 .tournamentBracketMatch::before {
@@ -286,7 +371,7 @@ button:disabled:active {
 }
 
 .tournamentBracketSlot + .tournamentBracketSlot {
-  border-top: 1px solid #e2e8f5;
+  border-top: 1px solid #bfd4a8;
 }
 
 .tournamentBracketConnectorOnly {
@@ -336,20 +421,20 @@ button:disabled:active {
 }
 
 .bracketCard {
-  border: 1px solid #d4dced;
+  border: 1px solid #a8c487;
   border-radius: 8px;
-  background: #fafcff;
+  background: #f3f9ea;
   padding: 8px;
   margin-bottom: 8px;
 }
 
 .winner {
   font-weight: 700;
-  color: #0f5a20;
+  color: #325f2b;
 }
 
 .statusText {
-  color: #4b5563;
+  color: #435841;
 }
 
 .activeStateButton {

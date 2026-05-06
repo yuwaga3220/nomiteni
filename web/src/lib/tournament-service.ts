@@ -76,13 +76,15 @@ export async function buildPublicState() {
   return { participants: publicParticipants, activeTournaments };
 }
 
-// 観戦パスコードが一致するRUNNING OR FINISHEDのトーナメントをひとつだけ取得
+// 観戦パスコードが一致する公開中トーナメントをひとつだけ取得
 export async function getActiveTournamentByObserverPasscode(passcode: string) {
   const prisma = getPrisma();
   return prisma.tournament.findFirst({
     where: {
-      status: { in: [TournamentStatus.RUNNING, TournamentStatus.FINISHED] },
-      observerPasscode: passcode,
+      status: {
+        in: [TournamentStatus.READY, TournamentStatus.RUNNING, TournamentStatus.FINISHED],
+      },
+      observerPasscode: passcode.trim(),
     },
     orderBy: { id: "desc" },
   });

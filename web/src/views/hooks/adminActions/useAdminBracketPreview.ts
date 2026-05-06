@@ -79,7 +79,7 @@ export function useAdminBracketPreview(params: UseAdminBracketPreviewParams) {
           ? "決勝"
           : roundIndex === totalRounds - 2
             ? "準決勝"
-            : `R${roundIndex + 1}`;
+            : `${roundIndex + 1}回戦`;
       const isFinal = roundIndex === totalRounds - 1;
       const isSemifinal = roundIndex === totalRounds - 2;
       const matchGap =
@@ -99,7 +99,7 @@ export function useAdminBracketPreview(params: UseAdminBracketPreviewParams) {
 
         const topSourceMatch = matchIndex * 2 + 1;
         const bottomSourceMatch = topSourceMatch + 1;
-        const sourceRoundLabel = roundIndex === 1 ? "1回戦" : `R${roundIndex}`;
+        const sourceRoundLabel = `${roundIndex}回戦`;
         return {
           topLabel: `${sourceRoundLabel} 第${topSourceMatch}試合 勝者`,
           bottomLabel: `${sourceRoundLabel} 第${bottomSourceMatch}試合 勝者`,

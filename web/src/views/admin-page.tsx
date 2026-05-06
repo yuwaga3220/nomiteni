@@ -4,7 +4,7 @@
 
 import { useLayoutEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { TournamentSettingSection, TournamentEditSection, TournamentManagementSection, ObserveSection } from "@/components/AppSections";
+import { TournamentSettingSection, EditDrawSection, ManageTournamentSection, ObserveSection } from "@/components/AppSections";
 import { useNomiteni } from "@/context/NomiteniContext";
 import { useAdminActions } from "./hooks/useAdminActions";
 
@@ -87,7 +87,7 @@ export function AdminPage() {
         onUpdateParticipant={actions.onUpdateParticipant}
         onDeleteParticipant={actions.onDeleteParticipant}
       />
-      <TournamentEditSection
+      <EditDrawSection
         bracketSize={actions.bracketSize}
         bracketHeight={actions.bracketHeight}
         bracketRounds={actions.bracketRounds}
@@ -98,9 +98,9 @@ export function AdminPage() {
         selectedParticipantId2={selectedParticipantId2}
         setSelectedParticipantId2={setSelectedParticipantId2}
         onSwapParticipants={actions.onSwapParticipants}
-/>
+      />
       {active && (
-        <TournamentManagementSection
+        <ManageTournamentSection
           courtCount={active.courtCount ?? 1}
           matches={assignableMatches}
           playerName={playerName}
@@ -115,8 +115,6 @@ export function AdminPage() {
         groupedRounds={groupedRounds}
         playerName={playerName}
         matchStatusLabel={matchStatusLabel}
-        bracketSize={actions.bracketSize}
-        bracketRounds={actions.bracketRounds}
       />
     </>
   );

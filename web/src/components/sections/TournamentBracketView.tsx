@@ -4,11 +4,13 @@
 
 import { useMemo } from "react";
 import { Match, MATCH_STATES, SingleEliminationBracket, createTheme } from "@g-loot/react-tournament-brackets";
-import { StyleSheetManager } from "styled-components";
 
 type BracketMatchView = {
   topLabel: string;
   bottomLabel: string;
+  topId?: number | null;
+  bottomId?: number | null;
+  winnerId?: number | null;
 };
 
 export type BracketRoundView = {
@@ -31,7 +33,7 @@ type LibMatchParticipant = {
   name: string;
   isWinner: boolean;
   status: null;
-  resultText: null;
+  resultText: string | null;
 };
 
 type LibMatch = {
@@ -44,36 +46,36 @@ type LibMatch = {
   participants: [LibMatchParticipant, LibMatchParticipant];
 };
 
-const lightBlueTheme = createTheme({
+const lightGreenTheme = createTheme({
   textColor: {
-    main: "#4f6f94",
-    highlighted: "#4f6f94",
-    dark: "#7f98b5",
+    main: "#36542e",
+    highlighted: "#2f4a28",
+    dark: "#5d7b52",
   },
   matchBackground: {
-    wonColor: "#f2f7ff",
-    lostColor: "#f2f7ff",
+    wonColor: "#f3f9ea",
+    lostColor: "#f3f9ea",
   },
   score: {
     background: {
-      wonColor: "#e6f0ff",
-      lostColor: "#e6f0ff",
+      wonColor: "#dceccc",
+      lostColor: "#dceccc",
     },
     text: {
-      highlightedWonColor: "#4f6f94",
-      highlightedLostColor: "#4f6f94",
+      highlightedWonColor: "#325a2a",
+      highlightedLostColor: "#325a2a",
     },
   },
   border: {
-    color: "#c8dbf2",
-    highlightedColor: "#c8dbf2",
+    color: "#a9c58c",
+    highlightedColor: "#84a766",
   },
   roundHeaders: {
-    background: "#eef5ff",
+    background: "#e9f5dc",
   },
-  connectorColor: "#bfd5f0",
-  connectorColorHighlight: "#bfd5f0",
-  canvasBackground: "#f8fbff",
+  connectorColor: "#7fa35f",
+  connectorColorHighlight: "#6d934f",
+  canvasBackground: "#f4faef",
 });
 
 function roundTextGenerator(currentRound: number, totalRounds: number): string {
@@ -94,10 +96,12 @@ export function TournamentBracketView(props: TournamentBracketViewProps) {
         const nextMatchId = isFinalRound
           ? null
           : `R${roundIndex + 2}-M${Math.floor(matchIndex / 2) + 1}`;
+        const topWon = match.topId != null && match.winnerId === match.topId;
+        const bottomWon = match.bottomId != null && match.winnerId === match.bottomId;
 
         return {
           id,
-          name: props.showMatchDescription === false ? "" : `${round.title} ${matchIndex + 1}`,
+          name: props.showMatchDescription === false ? "" : `${round.title} 第${matchIndex + 1}試合`,
           nextMatchId,
           tournamentRoundText: round.title,
           startTime: "",
@@ -106,16 +110,16 @@ export function TournamentBracketView(props: TournamentBracketViewProps) {
             {
               id: `${id}-top`,
               name: match.topLabel,
-              isWinner: false,
+              isWinner: topWon,
               status: null,
-              resultText: null,
+              resultText: topWon ? "勝" : null,
             },
             {
               id: `${id}-bottom`,
               name: match.bottomLabel,
-              isWinner: false,
+              isWinner: bottomWon,
               status: null,
-              resultText: null,
+              resultText: bottomWon ? "勝" : null,
             },
           ],
         };
@@ -126,31 +130,25 @@ export function TournamentBracketView(props: TournamentBracketViewProps) {
   if (!matches.length) return null;
 
   return (
-    <div style={{ overflowX: "auto" }}>
-      <StyleSheetManager
-        shouldForwardProp={(prop, target) =>
-          typeof target !== "string" || !["won", "hovered", "highlighted"].includes(prop)
-        }
-      >
-        <SingleEliminationBracket
-          matches={matches}
-          matchComponent={Match}
-          theme={lightBlueTheme}
-          options={{
-            style: {
-              roundHeader: {
-                isShown: props.showRoundHeaders ?? false,
-                backgroundColor: lightBlueTheme.roundHeaders.background,
-                fontColor: lightBlueTheme.textColor.main,
-                fontSize: 16,
-                roundTextGenerator,
-              },
-              connectorColor: lightBlueTheme.connectorColor,
-              connectorColorHighlight: lightBlueTheme.connectorColorHighlight,
+    <div className="bracketViewport">
+      <SingleEliminationBracket
+        matches={matches}
+        matchComponent={Match}
+        theme={lightGreenTheme}
+        options={{
+          style: {
+            roundHeader: {
+              isShown: props.showRoundHeaders ?? false,
+              backgroundColor: lightGreenTheme.roundHeaders.background,
+              fontColor: lightGreenTheme.textColor.main,
+              fontSize: 16,
+              roundTextGenerator,
             },
-          }}
-        />
-      </StyleSheetManager>
+            connectorColor: lightGreenTheme.connectorColor,
+            connectorColorHighlight: lightGreenTheme.connectorColorHighlight,
+          },
+        }}
+      />
     </div>
   );
 }

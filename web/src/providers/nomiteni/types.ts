@@ -1,0 +1,63 @@
+"use client";
+
+import type { Dispatch, SetStateAction } from "react";
+import type { AuthMode, Me, PublicState, TournamentParticipant } from "@/types";
+
+export type NomiteniBootstrapData = {
+  user: Me | null;
+  isLoggedIn: boolean;
+  isAdminSession: boolean;
+  state: PublicState;
+  sessionTournamentId: number | null;
+};
+
+export type NomiteniLocalState = {
+  me: Me | null;
+  setMe: Dispatch<SetStateAction<Me | null>>;
+  state: PublicState | null;
+  setState: Dispatch<SetStateAction<PublicState | null>>;
+  message: string;
+  setMessage: Dispatch<SetStateAction<string>>;
+  forceLoginCardsView: boolean;
+  setForceLoginCardsView: Dispatch<SetStateAction<boolean>>;
+  authModalState: AuthMode;
+  setAuthModalState: Dispatch<SetStateAction<AuthMode>>;
+  authEmail: string;
+  setAuthEmail: Dispatch<SetStateAction<string>>;
+  authPassword: string;
+  setAuthPassword: Dispatch<SetStateAction<string>>;
+  adminPasscode: string;
+  setAdminPasscode: Dispatch<SetStateAction<string>>;
+  observerLoginPasscode: string;
+  setObserverLoginPasscode: Dispatch<SetStateAction<string>>;
+  createModalOpen: boolean;
+  setCreateModalOpen: Dispatch<SetStateAction<boolean>>;
+  createTournamentName: string;
+  setCreateTournamentName: Dispatch<SetStateAction<string>>;
+  createTournamentDate: string;
+  setCreateTournamentDate: Dispatch<SetStateAction<string>>;
+  createTournamentTimeSlot: string;
+  setCreateTournamentTimeSlot: Dispatch<SetStateAction<string>>;
+  createTournamentCourtCount: number;
+  setCreateTournamentCourtCount: Dispatch<SetStateAction<number>>;
+  createTournamentObserverPasscode: string;
+  setCreateTournamentObserverPasscode: Dispatch<SetStateAction<string>>;
+  observerSetPasscode: string;
+  setObserverSetPasscode: Dispatch<SetStateAction<string>>;
+  tournamentParticipants: TournamentParticipant[];
+  setTournamentParticipants: Dispatch<SetStateAction<TournamentParticipant[]>>;
+  tournamentName: string;
+  setTournamentName: Dispatch<SetStateAction<string>>;
+  tournamentDate: string;
+  setTournamentDate: Dispatch<SetStateAction<string>>;
+  tournamentTimeSlot: string;
+  setTournamentTimeSlot: Dispatch<SetStateAction<string>>;
+  courtCountInput: number;
+  setCourtCountInput: Dispatch<SetStateAction<number>>;
+  isLoggedIn: boolean;
+  setIsLoggedIn: Dispatch<SetStateAction<boolean>>;
+  isAdminSession: boolean;
+  setIsAdminSession: Dispatch<SetStateAction<boolean>>;
+  sessionTournamentId: number | null;
+  setSessionTournamentId: Dispatch<SetStateAction<number | null>>;
+};

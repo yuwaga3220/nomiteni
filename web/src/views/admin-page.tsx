@@ -4,7 +4,13 @@
 
 import { useLayoutEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { TournamentSettingSection, EditDrawSection, ManageTournamentSection, ObserveSection } from "@/components/AppSections";
+import {
+  TournamentStatusSection,
+  TournamentSettingSection,
+  EditDrawSection,
+  ManageTournamentSection,
+  ObserveSection,
+} from "@/components/AppSections";
 import { useNomiteni } from "@/context/NomiteniContext";
 import { useAdminActions } from "./hooks/useAdminActions";
 
@@ -67,6 +73,10 @@ export function AdminPage() {
         <br />
         <button onClick={() => router.push("/")}>ホームに戻る</button>
       </section>
+      <TournamentStatusSection
+        active={active}
+        onSetTournamentStatus={actions.onSetTournamentStatus}
+      />
       <TournamentSettingSection
         active={active}
         state={state}
@@ -82,7 +92,6 @@ export function AdminPage() {
         setObserverSetPasscode={setObserverSetPasscode}
         participants={tournamentParticipants}
         onSaveTournamentSettings={actions.onSaveTournamentSettings}
-        onSetTournamentStatus={actions.onSetTournamentStatus}
         onCreateParticipant={actions.onCreateParticipant}
         onUpdateParticipant={actions.onUpdateParticipant}
         onDeleteParticipant={actions.onDeleteParticipant}

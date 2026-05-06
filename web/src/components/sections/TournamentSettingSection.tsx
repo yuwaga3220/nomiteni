@@ -3,10 +3,7 @@
 "use client";
 
 import type { PublicState, Tournament, TournamentParticipant } from "@/types";
-import { getStatusLabel } from "@/lib/status-label";
 import { RegisterParticipantsSection } from "./RegisterParticipantsSection";
-
-type TournamentStatus = "READY" | "RUNNING" | "FINISHED";
 
 // 管理者メニューセクションのプロパティ
 type TournamentSettingProps = {
@@ -24,7 +21,6 @@ type TournamentSettingProps = {
   setObserverSetPasscode: (v: string) => void;
   participants: TournamentParticipant[];
   onSaveTournamentSettings: () => void;
-  onSetTournamentStatus: (status: TournamentStatus) => void;
   onCreateParticipant: (name: string) => void;
   onUpdateParticipant: (id: number, name: string) => void;
   onDeleteParticipant: (id: number) => void;
@@ -33,8 +29,6 @@ type TournamentSettingProps = {
 // 大会設定セクション
 export function TournamentSettingSection(props: TournamentSettingProps) {
   const isReady = (props.active?.status ?? "").toUpperCase() === "READY";
-  const isRunning = (props.active?.status ?? "").toUpperCase() === "RUNNING";
-  const isFinished = (props.active?.status ?? "").toUpperCase() === "FINISHED";
 
   // 管理者メニューセクションを返す
   return (
@@ -42,32 +36,6 @@ export function TournamentSettingSection(props: TournamentSettingProps) {
       <div className="card">
         <h2>大会設定</h2>
         <p>大会の設定を変更することができます。</p>
-        {props.active && (
-          <div className="message">
-            <strong>現在の大会</strong>: {props.active.name} (ID: {props.active.id}) / 状態: {getStatusLabel(props.active.status)}
-          </div>
-        )}
-        <div className="row">
-          <label>大会状態</label>
-          <button
-            onClick={() => props.onSetTournamentStatus("READY")}
-            disabled={!isFinished}
-          >
-            準備中
-          </button>
-          <button
-            onClick={() => props.onSetTournamentStatus("RUNNING")}
-            disabled={!(isReady)}
-          >
-            進行中
-          </button>
-          <button
-            onClick={() => props.onSetTournamentStatus("FINISHED")}
-            disabled={!isRunning}
-          >
-            終了
-          </button>
-        </div>
         <label>大会名</label>
         <input value={props.tournamentName} onChange={(e) => props.setTournamentName(e.target.value)} />
         <label>開催日</label>

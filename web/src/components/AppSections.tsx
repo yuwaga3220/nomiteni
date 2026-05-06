@@ -6,6 +6,7 @@
 export { HeaderAuthButtons } from "./sections/HeaderAuthButtons";
 export { AuthModal } from "./modals/AuthModal";
 export { HomeSection } from "./sections/HomeSection";
+export { TournamentStatusSection } from "./sections/TournamentStatusSection";
 export { TournamentSettingSection } from "./sections/TournamentSettingSection";
 export { EditDrawSection } from "./sections/EditDrawSection";
 export { ManageTournamentSection } from "./sections/ManageTournamentSection";
